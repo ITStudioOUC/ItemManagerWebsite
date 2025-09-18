@@ -296,7 +296,18 @@ export default {
     async saveItem() {
       try {
         await this.$refs.itemForm.validate()
-        await itemService.createItem(this.newItem)
+
+        const itemData = { ...this.newItem }
+
+        // 格式化购买日期
+        if (itemData.purchase_date) {
+          const date = new Date(itemData.purchase_date)
+          itemData.purchase_date = date.getFullYear() + '-' +
+            String(date.getMonth() + 1).padStart(2, '0') + '-' +
+            String(date.getDate()).padStart(2, '0')
+        }
+
+        await itemService.createItem(itemData)
         ElMessage.success('物品添加成功')
         this.showAddDialog = false
         this.newItem = {
@@ -364,6 +375,25 @@ export default {
 </script>
 
 <style scoped>
+.el-header {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,.12), 0 0 6px rgba(0,0,0,.04);
+  height: 60px !important;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .item-list {
   padding: 20px;
 }
