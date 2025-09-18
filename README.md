@@ -28,6 +28,12 @@ pnpm run build
 
 后端使用 Django 框架开发，使用方法如下
 
+## 安装软件包
+
+```
+pip install -r requirements.txt
+```
+
 ## 部署
 
 ```
