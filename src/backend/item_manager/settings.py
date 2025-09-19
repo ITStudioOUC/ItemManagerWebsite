@@ -11,18 +11,21 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import SECURE
+import json
 # SECURE 文件用来存储敏感信息，如 SECRET_KEY，SMTP信息 等
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+with open(Path(__file__).parent / 'secure.json', encoding='utf-8') as f:
+    SECURE = json.load(f)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = SECURE.SECRET_KEY
+SECRET_KEY = SECURE["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -154,13 +157,13 @@ USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
 
 # Email settings
-EMAIL_HOST = SECURE.SMTP["EMAIL_HOST"]
-EMAIL_PORT = SECURE.SMTP["EMAIL_PORT"]
-EMAIL_HOST_USER = SECURE.SMTP["EMAIL_HOST_USER"]
-EMAIL_HOST_PASSWORD = SECURE.SMTP["EMAIL_HOST_PASSWORD"]
-EMAIL_USE_SSL = SECURE.SMTP["EMAIL_USE_SSL"]
-DEFAULT_FROM_EMAIL = SECURE.SMTP["DEFAULT_FROM_EMAIL"]
-ADMINS = SECURE.SMTP["ADMINS"]
+EMAIL_HOST = SECURE["SMTP"]["EMAIL_HOST"]
+EMAIL_PORT = SECURE["SMTP"]["EMAIL_PORT"]
+EMAIL_HOST_USER = SECURE["SMTP"]["EMAIL_HOST_USER"]
+EMAIL_HOST_PASSWORD = SECURE["SMTP"]["EMAIL_HOST_PASSWORD"]
+EMAIL_USE_SSL = SECURE["SMTP"]["EMAIL_USE_SSL"]
+DEFAULT_FROM_EMAIL = SECURE["SMTP"]["DEFAULT_FROM_EMAIL"]
+ADMINS = SECURE["SMTP"]["ADMINS"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
