@@ -22,7 +22,7 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = [
             'id', 'name', 'description', 'serial_number', 'category', 'status',
-            'location', 'purchase_date', 'value', 'created_at', 'updated_at',
+            'location', 'owner', 'purchase_date', 'value', 'created_at', 'updated_at',
             'current_user'
         ]
 

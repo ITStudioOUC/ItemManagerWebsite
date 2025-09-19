@@ -1,30 +1,7 @@
 <template>
-  <el-header>
-    <div class="header-content">
-      <h1 class="logo">爱特工作室物品管理系统</h1>
-      <el-menu
-          mode="horizontal"
-          :default-active="$route.path"
-          router
-          class="nav-menu"
-      >
-        <el-menu-item index="/">
-          <el-icon><House /></el-icon>
-          首页
-        </el-menu-item>
-        <el-menu-item index="/items">
-          <el-icon><Box /></el-icon>
-          物品管理
-        </el-menu-item>
-        <el-menu-item index="/usage">
-          <el-icon><Document /></el-icon>
-          使用记录
-        </el-menu-item>
-      </el-menu>
-    </div>
-  </el-header>
+  <AppHeader />
   <div class="dashboard">
-    <el-row :gutter="20">
+    <el-row :gutter="42">
       <el-col :span="6">
         <el-card class="stat-card">
           <div class="stat-content">
@@ -73,6 +50,58 @@
             <div class="stat-info">
               <h3>{{ stats.maintenance }}</h3>
               <p>维护中</p>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon damaged">
+              <el-icon><WarningFilled /></el-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.damaged }}</h3>
+              <p>损坏</p>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon lost">
+              <el-icon><QuestionFilled /></el-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.lost }}</h3>
+              <p>丢失</p>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon abandoned">
+              <el-icon><Delete /></el-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.abandoned }}</h3>
+              <p>已弃用</p>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon prohibited">
+              <el-icon><Lock /></el-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.prohibited }}</h3>
+              <p>禁止借用</p>
             </div>
           </div>
         </el-card>
@@ -127,16 +156,24 @@
 <script>
 import { itemService, usageService } from '../services/api'
 import moment from 'moment'
+import AppHeader from '../components/AppHeader.vue'
 
 export default {
   name: 'Dashboard',
+  components: {
+    AppHeader
+  },
   data() {
     return {
       stats: {
         total: 0,
         available: 0,
         inUse: 0,
-        maintenance: 0
+        maintenance: 0,
+        damaged: 0,
+        lost: 0,
+        abandoned: 0,
+        prohibited: 0,
       },
       currentUsages: [],
       recentItems: []
@@ -156,6 +193,10 @@ export default {
         this.stats.available = items.filter(item => item.status === 'available').length
         this.stats.inUse = items.filter(item => item.status === 'in_use').length
         this.stats.maintenance = items.filter(item => item.status === 'maintenance').length
+        this.stats.damaged = items.filter(item => item.status === 'damaged').length
+        this.stats.lost = items.filter(item => item.status === 'lost').length
+        this.stats.abandoned = items.filter(item => item.status === 'abandoned').length
+        this.stats.prohibited = items.filter(item => item.status === 'prohibited').length
 
         // 获取最新物品
         this.recentItems = items.slice(0, 5)
@@ -177,7 +218,10 @@ export default {
         'available': 'success',
         'in_use': 'warning',
         'maintenance': 'info',
-        'damaged': 'danger'
+        'damaged': 'danger',
+        'lost': 'danger',
+        'abandoned': 'info',
+        'prohibited': 'warning',
       }
       return typeMap[status] || 'info'
     },
@@ -186,7 +230,10 @@ export default {
         'available': '可用',
         'in_use': '使用中',
         'maintenance': '维护中',
-        'damaged': '损坏'
+        'damaged': '损坏',
+        'lost': '丢失',
+        'abandoned': '已弃用',
+        'prohibited': '禁止借用',
       }
       return textMap[status] || '未知'
     }
@@ -195,43 +242,6 @@ export default {
 </script>
 
 <style scoped>
-.el-header {
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0,0,0,.12), 0 0 6px rgba(0,0,0,.04);
-  height: 60px !important;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.logo {
-  color: #409eff;
-  font-size: 20px;
-  font-weight: bold;
-  margin: 0;
-}
-
-.nav-menu {
-  border-bottom: none;
-  background-color: transparent;
-}
-
-.nav-menu .el-menu-item {
-  border-bottom: none;
-  height: 60px;
-  line-height: 60px;
-}
-
 .dashboard {
   padding: 20px;
 }
@@ -271,6 +281,22 @@ export default {
 
 .stat-icon.maintenance {
   background-color: #909399;
+}
+
+.stat-icon.damaged {
+  background-color: #f56c6c;
+}
+
+.stat-icon.lost {
+  background-color: #f59e0b;
+}
+
+.stat-icon.abandoned {
+  background-color: #8e8e8e;
+}
+
+.stat-icon.prohibited {
+  background-color: #409eff;
 }
 
 .stat-info h3 {

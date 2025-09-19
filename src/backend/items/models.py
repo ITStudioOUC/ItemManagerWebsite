@@ -9,6 +9,9 @@ class Item(models.Model):
         ('in_use', '使用中'),
         ('maintenance', '维护中'),
         ('damaged', '损坏'),
+        ('lost', '丢失'),
+        ('abandoned', '已弃用'),
+        ('prohibited', '禁止借用'),
     ]
 
     name = models.CharField(max_length=100, verbose_name='物品名称')
@@ -17,6 +20,7 @@ class Item(models.Model):
     category = models.CharField(max_length=50, verbose_name='物品类别')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='available', verbose_name='物品状态')
     location = models.CharField(max_length=100, blank=True, verbose_name='存放位置')
+    owner = models.CharField(max_length=100, blank=True, null=True, verbose_name='所有者')
     purchase_date = models.DateField(null=True, blank=True, verbose_name='购买日期')
     value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='价值')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')

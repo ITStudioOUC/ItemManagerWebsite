@@ -1,28 +1,5 @@
 <template>
-  <el-header>
-    <div class="header-content">
-      <h1 class="logo">爱特工作室物品管理系统</h1>
-      <el-menu
-          mode="horizontal"
-          :default-active="$route.path"
-          router
-          class="nav-menu"
-      >
-        <el-menu-item index="/">
-          <el-icon><House /></el-icon>
-          首页
-        </el-menu-item>
-        <el-menu-item index="/items">
-          <el-icon><Box /></el-icon>
-          物品管理
-        </el-menu-item>
-        <el-menu-item index="/usage">
-          <el-icon><Document /></el-icon>
-          使用记录
-        </el-menu-item>
-      </el-menu>
-    </div>
-  </el-header>
+  <AppHeader />
   <div class="item-detail">
     <div class="detail-header">
       <el-button @click="$router.go(-1)" style="margin-bottom: 20px;">
@@ -60,10 +37,16 @@
                   <el-option label="使用中" value="in_use" />
                   <el-option label="维护中" value="maintenance" />
                   <el-option label="损坏" value="damaged" />
+                  <el-option label="丢失" value="lost" />
+                  <el-option label="已弃用" value="abandoned" />
+                  <el-option label="禁止借用" value="prohibited" />
                 </el-select>
               </el-form-item>
               <el-form-item label="位置">
                 <el-input v-model="editableItem.location" />
+              </el-form-item>
+              <el-form-item label="所有者">
+                <el-input v-model="editableItem.owner" :disabled="!editMode" placeholder="请输入所有者姓名" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -160,10 +143,14 @@
 <script>
 import { itemService } from '../services/api'
 import { ElMessage } from 'element-plus'
+import AppHeader from '../components/AppHeader.vue'
 import moment from 'moment'
 
 export default {
   name: 'ItemDetail',
+  components: {
+    AppHeader
+  },
   props: {
     id: {
       type: String,
@@ -220,25 +207,6 @@ export default {
 </script>
 
 <style scoped>
-.el-header {
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0,0,0,.12), 0 0 6px rgba(0,0,0,.04);
-  height: 60px !important;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
 .item-detail {
   padding: 20px;
 }

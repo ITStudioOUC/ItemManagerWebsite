@@ -1,28 +1,5 @@
 <template>
-  <el-header>
-    <div class="header-content">
-      <h1 class="logo">爱特工作室物品管理系统</h1>
-      <el-menu
-          mode="horizontal"
-          :default-active="$route.path"
-          router
-          class="nav-menu"
-      >
-        <el-menu-item index="/">
-          <el-icon><House /></el-icon>
-          首页
-        </el-menu-item>
-        <el-menu-item index="/items">
-          <el-icon><Box /></el-icon>
-          物品管理
-        </el-menu-item>
-        <el-menu-item index="/usage">
-          <el-icon><Document /></el-icon>
-          使用记录
-        </el-menu-item>
-      </el-menu>
-    </div>
-  </el-header>
+  <AppHeader />
   <div class="item-list">
     <div class="toolbar">
       <el-button type="primary" @click="showAddDialog = true">
@@ -46,6 +23,9 @@
           <el-option label="使用中" value="in_use" />
           <el-option label="维护中" value="maintenance" />
           <el-option label="损坏" value="damaged" />
+          <el-option label="丢失" value="lost" />
+          <el-option label="已弃用" value="abandoned" />
+          <el-option label="禁止借用" value="prohibited" />
         </el-select>
       </div>
     </div>
@@ -59,6 +39,14 @@
           <el-tag :type="getStatusType(scope.row.status)">
             {{ getStatusText(scope.row.status) }}
           </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="owner" label="所有者">
+        <template #default="scope">
+          <span v-if="scope.row.owner">
+            {{ scope.row.owner }}
+          </span>
+          <span v-else>-</span>
         </template>
       </el-table-column>
       <el-table-column prop="current_user" label="当前使用者">
@@ -122,6 +110,9 @@
         <el-form-item label="购买日期">
           <el-date-picker v-model="newItem.purchase_date" type="date" />
         </el-form-item>
+        <el-form-item label="所有者">
+          <el-input v-model="newItem.owner" placeholder="请输入所有者姓名" />
+        </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="showAddDialog = false">取消</el-button>
@@ -173,15 +164,64 @@
         <el-button type="primary" @click="confirmReturn">确认归还</el-button>
       </template>
     </el-dialog>
+
+    <!-- 编辑物品对话框 -->
+    <el-dialog v-model="showEditDialog" title="编辑物品" width="600px">
+      <el-form :model="editForm" label-width="100px" :rules="itemRules" ref="editForm">
+        <el-form-item label="物品名称" prop="name">
+          <el-input v-model="editForm.name" />
+        </el-form-item>
+        <el-form-item label="序列号" prop="serial_number">
+          <el-input v-model="editForm.serial_number" />
+        </el-form-item>
+        <el-form-item label="类别" prop="category">
+          <el-input v-model="editForm.category" />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select v-model="editForm.status">
+            <el-option label="可用" value="available" />
+            <el-option label="使用中" value="in_use" />
+            <el-option label="维护中" value="maintenance" />
+            <el-option label="损坏" value="damaged" />
+            <el-option label="丢失" value="lost" />
+            <el-option label="已弃用" value="abandoned" />
+            <el-option label="禁止借用" value="prohibited" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input type="textarea" v-model="editForm.description" />
+        </el-form-item>
+        <el-form-item label="位置">
+          <el-input v-model="editForm.location" />
+        </el-form-item>
+        <el-form-item label="价值">
+          <el-input-number v-model="editForm.value" :precision="2" :min="0" />
+        </el-form-item>
+        <el-form-item label="购买日期">
+          <el-date-picker v-model="editForm.purchase_date" type="date" />
+        </el-form-item>
+        <el-form-item label="所有者" prop="owner_id">
+          <el-input v-model="editForm.owner" placeholder="请输入所有者姓名" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showEditDialog = false">取消</el-button>
+        <el-button type="primary" @click="updateItem">保存修改</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { itemService, userService } from '../services/api'
 import { ElMessage } from 'element-plus'
+import AppHeader from '../components/AppHeader.vue'
 
 export default {
   name: 'ItemList',
+  components: {
+    AppHeader
+  },
   data() {
     return {
       items: [],
@@ -192,6 +232,7 @@ export default {
       showAddDialog: false,
       showBorrowDialog: false,
       showReturnDialog: false,
+      showEditDialog: false,
       currentItem: null,
       newItem: {
         name: '',
@@ -200,7 +241,8 @@ export default {
         description: '',
         location: '',
         value: null,
-        purchase_date: null
+        purchase_date: null,
+        owner: ''
       },
       borrowForm: {
         user_id: null,
@@ -211,6 +253,18 @@ export default {
       returnForm: {
         condition_after: '',
         return_notes: ''
+      },
+      editForm: {
+        id: null,
+        name: '',
+        serial_number: '',
+        category: '',
+        status: '',
+        description: '',
+        location: '',
+        value: null,
+        purchase_date: null,
+        owner: ''
       },
       itemRules: {
         name: [{ required: true, message: '请输入物品名称', trigger: 'blur' }],
@@ -272,8 +326,9 @@ export default {
       this.$router.push(`/items/${id}`)
     },
     editItem(item) {
-      // TODO: 实现编辑功能
-      ElMessage.info('编辑功能开发中')
+      this.currentItem = item
+      this.editForm = { ...item }
+      this.showEditDialog = true
     },
     borrowItem(item) {
       this.currentItem = item
@@ -317,7 +372,8 @@ export default {
           description: '',
           location: '',
           value: null,
-          purchase_date: null
+          purchase_date: null,
+          owner: ''
         }
         await this.loadItems()
       } catch (error) {
@@ -352,12 +408,38 @@ export default {
         ElMessage.error('归还失败')
       }
     },
+    async updateItem() {
+      try {
+        await this.$refs.editForm.validate()
+
+        const itemData = { ...this.editForm }
+
+        // 格式化购买日期
+        if (itemData.purchase_date) {
+          const date = new Date(itemData.purchase_date)
+          itemData.purchase_date = date.getFullYear() + '-' +
+            String(date.getMonth() + 1).padStart(2, '0') + '-' +
+            String(date.getDate()).padStart(2, '0')
+        }
+
+        await itemService.updateItem(itemData.id, itemData)
+        ElMessage.success('物品信息更新成功')
+        this.showEditDialog = false
+        await this.loadItems()
+      } catch (error) {
+        console.error('更新物品失败:', error)
+        ElMessage.error('更新物品失败')
+      }
+    },
     getStatusType(status) {
       const typeMap = {
         'available': 'success',
         'in_use': 'warning',
         'maintenance': 'info',
-        'damaged': 'danger'
+        'damaged': 'danger',
+        'lost': 'danger',
+        'abandoned': 'info',
+        'prohibited': 'warning'
       }
       return typeMap[status] || 'info'
     },
@@ -366,7 +448,10 @@ export default {
         'available': '可用',
         'in_use': '使用中',
         'maintenance': '维护中',
-        'damaged': '损坏'
+        'damaged': '损坏',
+        'lost': '丢失',
+        'abandoned': '已弃用',
+        'prohibited': '禁止借用'
       }
       return textMap[status] || '未知'
     }
@@ -375,25 +460,6 @@ export default {
 </script>
 
 <style scoped>
-.el-header {
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0,0,0,.12), 0 0 6px rgba(0,0,0,.04);
-  height: 60px !important;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
 .item-list {
   padding: 20px;
 }
