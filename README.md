@@ -26,16 +26,10 @@ pnpm run build
 
 # 后端
 
-后端使用 Django 框架开发，使用方法如下
+后端使用 Django 框架开发，搭配 asgi + uvicorn + gunicorn 食用，运行`src/backend/start.sh`即可自动构建部署
 
-## 安装软件包
+若 venv 环境创建失败，请手动输入
 
-```
-pip install -r requirements.txt
-```
-
-## 部署
-
-```
-python manage.py runserver
+```shell
+apt install python3-venv
 ```

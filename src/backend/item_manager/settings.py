@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-=)6qk8+!)hmy7x@7=svo#-^0$pe+3ya@as6afe^o2wj*m-5#3(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '*']
 
 
 # Application definition
@@ -70,8 +70,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "item_manager.wsgi.application"
-
+ASGI_APPLICATION = "item_manager.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -121,7 +120,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True  # 开发阶段允许所有源
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Internationalization
@@ -140,6 +139,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# 安全设置（生产环境）
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = False  # 如果使用HTTPS，设置为True
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
