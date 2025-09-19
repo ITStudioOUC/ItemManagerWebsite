@@ -38,7 +38,9 @@ class Item(models.Model):
 class ItemUsage(models.Model):
     """物品使用记录模型"""
     item = models.ForeignKey(Item, on_delete=models.CASCADE, verbose_name='物品')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='使用者')
+    user = models.CharField(max_length=100, verbose_name='借用人姓名')
+    borrower_contact = models.CharField(max_length=100, default="NONE", verbose_name='借用人联系方式')
+    expected_return_time = models.DateTimeField(verbose_name='预计归还时间', blank=True, null=True)
     start_time = models.DateTimeField(verbose_name='开始使用时间')
     end_time = models.DateTimeField(null=True, blank=True, verbose_name='结束使用时间')
     purpose = models.CharField(max_length=200, verbose_name='使用目的')
@@ -54,7 +56,7 @@ class ItemUsage(models.Model):
         ordering = ['-start_time']
 
     def __str__(self):
-        return f"{self.item.name} - {self.user.username} ({self.start_time.strftime('%Y-%m-%d %H:%M')})"
+        return f"{self.item.name} - {self.user} ({self.start_time.strftime('%Y-%m-%d %H:%M')})"
 
 
 class Category(models.Model):
