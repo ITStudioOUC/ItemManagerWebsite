@@ -2,7 +2,6 @@
   <AppHeader />
   <div class="item-usage">
     <div class="toolbar">
-      <h2>使用记录</h2>
       <div class="filters">
         <el-select v-model="statusFilter" placeholder="状态筛选" @change="handleFilter">
           <el-option label="全部" value="" />
@@ -150,7 +149,7 @@
 </template>
 
 <script>
-import { usageService, userService } from '../services/api'
+import { usageService, userService } from '@/services/api'
 import { ElMessage } from 'element-plus'
 import moment from 'moment'
 import AppHeader from '../components/AppHeader.vue'
@@ -299,7 +298,7 @@ export default {
 
 .toolbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-bottom: 20px;
 }

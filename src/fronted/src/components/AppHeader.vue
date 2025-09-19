@@ -1,7 +1,7 @@
 <template>
   <el-header class="app-header">
     <div class="header-content">
-      <h1 class="logo">爱特工作室物品管理系统</h1>
+      <h1 class="logo">爱特工作室物品管理及财务管理系统</h1>
       <el-menu
           mode="horizontal"
           :default-active="$route.path"
@@ -10,7 +10,7 @@
       >
         <el-menu-item index="/">
           <el-icon><House /></el-icon>
-          首页
+          物品统计
         </el-menu-item>
         <el-menu-item index="/items">
           <el-icon><Box /></el-icon>
@@ -20,14 +20,31 @@
           <el-icon><Document /></el-icon>
           使用记录
         </el-menu-item>
+        <el-menu-item index="/finance">
+          <el-icon><Money /></el-icon>
+          财务管理
+        </el-menu-item>
+        <el-menu-item index="/finance/records">
+          <el-icon><Tickets /></el-icon>
+          财务记录
+        </el-menu-item>
       </el-menu>
     </div>
   </el-header>
 </template>
 
 <script>
+import { House, Box, Document, Money, Tickets } from '@element-plus/icons-vue'
+
 export default {
-  name: 'AppHeader'
+  name: 'AppHeader',
+  components: {
+    House,
+    Box,
+    Document,
+    Money,
+    Tickets
+  }
 }
 </script>
 
@@ -47,8 +64,8 @@ export default {
 .header-content {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   width: 100%;
+  position: relative;
 }
 
 .logo {
@@ -56,12 +73,20 @@ export default {
   font-size: 20px;
   font-weight: bold;
   margin: 0;
+  position: absolute;
+  left: 0;
+  z-index: 1;
 }
 
 .nav-menu {
   border-bottom: none;
-  width: 60%;
   background-color: transparent;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  left: 0;
+  right: 0;
 }
 
 .nav-menu .el-menu-item {

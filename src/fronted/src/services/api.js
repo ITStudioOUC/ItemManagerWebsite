@@ -1,6 +1,8 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:8000/api'
+export const API_BASE_URL = 'http://localhost:8000/api'
+
+export const API_BASE_URL_WITHOUT_API = 'http://localhost:8000'
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -109,22 +111,22 @@ export const usageService = {
 export const categoryService = {
   // 获取所有类别
   getAllCategories() {
-    return apiClient.get('/categories/')
+    return apiClient.get('/item_categories/')
   },
 
   // 创建新类别
   createCategory(category) {
-    return apiClient.post('/categories/', category)
+    return apiClient.post('/item_categories/', category)
   },
 
   // 更新类别
   updateCategory(id, category) {
-    return apiClient.put(`/categories/${id}/`, category)
+    return apiClient.put(`/item_categories/${id}/`, category)
   },
 
   // 删除类别
   deleteCategory(id) {
-    return apiClient.delete(`/categories/${id}/`)
+    return apiClient.delete(`/item_categories/${id}/`)
   }
 }
 
@@ -135,11 +137,61 @@ export const userService = {
   }
 }
 
-// 健康检查API
-export const healthService = {
-  checkBackendConnection() {
-    return apiClient.get('/items/')
-  }
-}
+export const financeService = {
+    // 获取所有财务记录
+    getAllFinanceRecords() {
+        return apiClient.get('/finance/')
+    },
 
-export default apiClient
+    // 获取单个财务记录
+    getFinanceRecord(id) {
+        return apiClient.get(`/finance/${id}/`)
+    },
+
+    // 创建财务记录
+    createFinanceRecord(record) {
+        return apiClient.post('/finance/', record, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+    },
+
+    // 更新财务记录
+    updateFinanceRecord(id, record) {
+        return apiClient.put(`/finance/${id}/`, record, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+    },
+
+    // 删除财务记录
+    deleteFinanceRecord(id) {
+        return apiClient.delete(`/finance/${id}/`)
+    },
+
+    // 为财务记录上传多张凭证图片
+    uploadImages(recordId, formData) {
+        return apiClient.post(`/finance/${recordId}/upload_images/`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+    },
+
+    // 删除凭证图片
+    deleteProofImage(imageId) {
+        return apiClient.delete(`/proof-images/${imageId}/`)
+    },
+
+    // 获取所有部门
+    getAllDepartments() {
+        return apiClient.get('/departments/')
+    },
+
+    // 获取所有类别
+    getAllCategories() {
+        return apiClient.get('/finance_categories/')
+    },
+}

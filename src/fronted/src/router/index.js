@@ -4,6 +4,9 @@ import ItemList from '../views/ItemList.vue'
 import ItemDetail from '../views/ItemDetail.vue'
 import ItemUsage from '../views/ItemUsage.vue'
 import Dashboard from '../views/Dashboard.vue'
+import FinanceDashboard from '../views/FinanceDashboard.vue'
+import FinanceRecordList from '../views/FinanceRecordList.vue'
+import FinanceRecordDetail from '../views/FinanceRecordDetail.vue'
 
 const routes = [
   {
@@ -31,6 +34,22 @@ const routes = [
     path: '/usage',
     name: 'ItemUsage',
     component: ItemUsage
+  },
+  {
+    path: '/finance',
+    name: 'FinanceDashboard',
+    component: FinanceDashboard
+  },
+  {
+    path: '/finance/records',
+    name: 'FinanceRecordList',
+    component: FinanceRecordList
+  },
+  {
+    path: '/finance/records/:id',
+    name: 'FinanceRecordDetail',
+    component: FinanceRecordDetail,
+    props: true
   }
 ]
 
