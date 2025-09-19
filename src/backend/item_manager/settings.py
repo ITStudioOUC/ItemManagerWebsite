@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import SECURE
+# SECURE 文件用来存储敏感信息，如 SECRET_KEY，SMTP信息 等
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-=)6qk8+!)hmy7x@7=svo#-^0$pe+3ya@as6afe^o2wj*m-5#3("
+SECRET_KEY = SECURE.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -150,6 +152,15 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = False  # 如果使用HTTPS，设置为True
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
+
+# Email settings
+EMAIL_HOST = SECURE.SMTP["EMAIL_HOST"]
+EMAIL_PORT = SECURE.SMTP["EMAIL_PORT"]
+EMAIL_HOST_USER = SECURE.SMTP["EMAIL_HOST_USER"]
+EMAIL_HOST_PASSWORD = SECURE.SMTP["EMAIL_HOST_PASSWORD"]
+EMAIL_USE_SSL = SECURE.SMTP["EMAIL_USE_SSL"]
+DEFAULT_FROM_EMAIL = SECURE.SMTP["DEFAULT_FROM_EMAIL"]
+ADMINS = SECURE.SMTP["ADMINS"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
