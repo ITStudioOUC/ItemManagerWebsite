@@ -1,38 +1,106 @@
 import axios from 'axios'
 
 export const API_BASE_URL = 'http://localhost:8000/api'
-
 export const API_BASE_URL_WITHOUT_API = 'http://localhost:8000'
+
+const ACCESS_TOKEN_KEY = 'access_token'
+const REFRESH_TOKEN_KEY = 'refresh_token'
+
+export const authService = {
+  getAccessToken() {
+    return localStorage.getItem(ACCESS_TOKEN_KEY)
+  },
+  getRefreshToken() {
+    return localStorage.getItem(REFRESH_TOKEN_KEY)
+  },
+  setTokens({ access, refresh }) {
+    if (access) localStorage.setItem(ACCESS_TOKEN_KEY, access)
+    if (refresh) localStorage.setItem(REFRESH_TOKEN_KEY, refresh)
+  },
+  clearTokens() {
+    localStorage.removeItem(ACCESS_TOKEN_KEY)
+    localStorage.removeItem(REFRESH_TOKEN_KEY)
+  },
+  isAuthenticated() {
+    return !!this.getAccessToken()
+  }
+}
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  headers: { 'Content-Type': 'application/json' }
 })
 
-// 请求拦截器
+// 请求拦截器：自动附加JWT
 apiClient.interceptors.request.use(
   config => {
-    console.log('API请求:', config.method?.toUpperCase(), config.url)
+    const token = authService.getAccessToken()
+    if (token) {
+      config.headers = config.headers || {}
+      config.headers['Authorization'] = `Bearer ${token}`
+    }
     return config
   },
-  error => {
+  error => Promise.reject(error)
+)
+
+// 响应拦截器：401时尝试刷新token并重试
+let isRefreshing = false
+let pendingQueue = []
+
+function processQueue(error, token = null) {
+  pendingQueue.forEach(({ resolve, reject, config }) => {
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`
+      resolve(apiClient(config))
+    } else {
+      reject(error)
+    }
+  })
+  pendingQueue = []
+}
+
+apiClient.interceptors.response.use(
+  response => response,
+  async error => {
+    const originalRequest = error.config || {}
+    const status = error.response?.status
+
+    if (status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          pendingQueue.push({ resolve, reject, config: originalRequest })
+        })
+      }
+
+      originalRequest._retry = true
+      isRefreshing = true
+
+      try {
+        const refresh = authService.getRefreshToken()
+        if (!refresh) throw new Error('No refresh token')
+        const resp = await axios.post(`${API_BASE_URL_WITHOUT_API}/api/token/refresh/`, { refresh })
+        const newAccess = resp.data?.access
+        if (!newAccess) throw new Error('No access token in refresh response')
+        authService.setTokens({ access: newAccess })
+        processQueue(null, newAccess)
+        return apiClient(originalRequest)
+      } catch (refreshErr) {
+        processQueue(refreshErr, null)
+        authService.clearTokens()
+        // 跳转到登录页
+        try { window?.location && (window.location.href = '/login') } catch (_) {}
+        return Promise.reject(refreshErr)
+      } finally {
+        isRefreshing = false
+      }
+    }
+
     return Promise.reject(error)
   }
 )
 
-// 响应拦截器
-apiClient.interceptors.response.use(
-  response => {
-    console.log('API响应:', response.status, response.config.url)
-    return response
-  },
-  error => {
-    console.error('API错误:', error.response?.status, error.response?.data)
-    return Promise.reject(error)
-  }
-)
+export { apiClient }
 
 export const itemService = {
   // 获取所有物品
@@ -314,4 +382,3 @@ export const projectGroupService = {
         })
     }
 }
-

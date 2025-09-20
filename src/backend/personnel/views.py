@@ -6,6 +6,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .filters import PersonnelFilter
 from .models import Personnel, ProjectGroup
@@ -20,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 class PersonnelViewSet(viewsets.ModelViewSet):
     """人员信息视图集"""
+    authentication_classes = [JWTAuthentication]
     queryset = Personnel.objects.all()
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = PersonnelFilter
@@ -191,6 +193,7 @@ class PersonnelViewSet(viewsets.ModelViewSet):
 
 class ProjectGroupViewSet(viewsets.ModelViewSet):
     """项目组视图集"""
+    authentication_classes = [JWTAuthentication]
     queryset = ProjectGroup.objects.all()
     serializer_class = ProjectGroupSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]

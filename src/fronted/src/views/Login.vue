@@ -17,7 +17,7 @@
     <!-- Header -->
     <div class="login-header">
       <div class="header-content">
-        <h1 class="system-title">爱特工作室物品管理及财务管理系统</h1>
+        <h1 class="system-title">爱特工作室管理系统</h1>
         <div class="favicon-container">
           <img src="../../public/favicon.svg" alt="网站图标" class="favicon">
         </div>
@@ -95,6 +95,7 @@
 
 <script>
 import {ElMessage} from 'element-plus'
+import { API_BASE_URL_WITHOUT_API, authService } from '@/services/api'
 
 export default {
   name: 'Login',
@@ -150,37 +151,43 @@ export default {
 
         this.isLoading = true
 
-        // 模拟登录API调用
-        await this.performLogin()
+        // 调用JWT登录
+        const resp = await fetch(`${API_BASE_URL_WITHOUT_API}/api/token/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: this.loginForm.username,
+            password: this.loginForm.password,
+          })
+        })
 
+        if (!resp.ok) {
+          throw new Error('用户名或密码错误')
+        }
+
+        const data = await resp.json()
+        const access = data.access
+        const refresh = data.refresh
+        if (!access || !refresh) {
+          throw new Error('登录响应缺少令牌')
+        }
+
+        authService.setTokens({ access, refresh })
         ElMessage.success('登录成功')
 
-        // 跳转到主页
-        await this.$router.push('/')
+        // 跳转到原目标或首页
+        const redirect = this.$route.query.redirect || '/'
+        await this.$router.replace(redirect)
 
       } catch (error) {
         console.error('登录失败:', error)
         if (error !== 'validation failed') {
-          ElMessage.error('登录失败，请检查账户和密码')
+          ElMessage.error(error.message || '登录失败，请检查账户和密码')
         }
       } finally {
         this.isLoading = false
       }
     },
-
-    async performLogin() {
-      // 模拟API调用延迟
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          // 简单的模拟验证
-          if (this.loginForm.username && this.loginForm.password) {
-            resolve()
-          } else {
-            reject(new Error('账户或密码错误'))
-          }
-        }, 1500)
-      })
-    }
   }
 }
 </script>

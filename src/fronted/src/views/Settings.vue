@@ -2,6 +2,7 @@
   <div class="settings-page">
     <AppHeader />
     <div class="settings-container">
+      <LogoutBar />
       <div class="settings-header">
         <h2>网站设置及说明</h2>
       </div>
@@ -121,7 +122,7 @@
           </template>
           <div class="content-section">
             <h3>系统介绍</h3>
-            <p>爱特工作室物品管理及财务管理系统是为爱特工作室量身定制的综合管理平台，主要功能包括：</p>
+            <p>爱特工作室管理系统是为爱特工作室量身定制的综合管理平台，主要功能包括：</p>
             <ul>
               <li><strong>物品管理：</strong>管理工作室的各类物品，包括电子设备、办公用品等</li>
               <li><strong>借用记录：</strong>跟踪物品的借用情况，确保物品流转透明化</li>
@@ -175,12 +176,14 @@ import {onMounted, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import {Delete, InfoFilled, Message, Plus} from '@element-plus/icons-vue'
 import AppHeader from '@/components/AppHeader.vue'
-import {API_BASE_URL_WITHOUT_API} from '@/services/api'
+import LogoutBar from '@/components/LogoutBar.vue'
+import {API_BASE_URL_WITHOUT_API, authService} from '@/services/api'
 
 export default {
   name: 'Settings',
   components: {
     AppHeader,
+    LogoutBar,
     Message,
     InfoFilled,
     Plus,
@@ -194,6 +197,14 @@ export default {
       description: '',
       is_enabled: true
     })
+
+    const authHeaders = () => {
+      const token = authService.getAccessToken()
+      return {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      }
+    }
 
     // 加载设置
     const loadSettings = () => {
@@ -210,9 +221,7 @@ export default {
       try {
         const response = await fetch(`${API_BASE_URL_WITHOUT_API}/api/notification-settings/`, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          }
+          headers: authHeaders()
         })
 
         if (response.ok) {
@@ -228,6 +237,8 @@ export default {
               allEmails.value = result.data.all_emails
             }
           }
+        } else if (response.status === 401) {
+          ElMessage.error('未授权，请重新登录')
         }
       } catch (error) {
         console.error('加载服务器设置失败:', error)
@@ -249,9 +260,7 @@ export default {
 
         const response = await fetch(`${API_BASE_URL_WITHOUT_API}/api/notification-settings/`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: authHeaders(),
           body: JSON.stringify({
             notification_emails: emailsToUpdate,
             email_enabled: emailNotificationEnabled.value
@@ -279,13 +288,9 @@ export default {
     // 切换单个邮箱启用状态
     const toggleEmailStatus = async (emailId, isEnabled) => {
       try {
-        // [关键修改] 请求发送到后端的 toggle_email_status 视图对应的 URL
-        // 你需要在 urls.py 中为 toggle_email_status 视图配置一个 URL，例如 'api/toggle-email-status/'
         const response = await fetch(`${API_BASE_URL_WITHOUT_API}/api/toggle-email-status/`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: authHeaders(),
           body: JSON.stringify({
             email_id: emailId,
             is_enabled: isEnabled
@@ -342,9 +347,7 @@ export default {
         // [关键修改] 将这个完整的列表发送给后端
         const response = await fetch(`${API_BASE_URL_WITHOUT_API}/api/notification-settings/`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: authHeaders(),
           body: JSON.stringify({
             notification_emails: updatedEmailList,
             email_enabled: emailNotificationEnabled.value // 别忘了带上总开关的状态
@@ -388,9 +391,7 @@ export default {
         // [关键修改] 将这个新列表发送给后端进行批量更新
         const response = await fetch(`${API_BASE_URL_WITHOUT_API}/api/notification-settings/`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: authHeaders(),
           body: JSON.stringify({
             notification_emails: updatedEmailList,
             email_enabled: emailNotificationEnabled.value // 别忘了带上总开关的状态

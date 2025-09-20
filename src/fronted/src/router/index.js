@@ -10,6 +10,7 @@ import FinanceRecordDetail from '../views/FinanceRecordDetail.vue'
 import PersonnelList from '../views/PersonnelList.vue'
 import DepartmentProjectGroupManagement from '../views/DepartmentProjectGroupManagement.vue'
 import Settings from '../views/Settings.vue'
+import { authService } from '@/services/api'
 
 const routes = [
   {
@@ -74,6 +75,25 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  // 允许直接访问登录页
+  if (to.path === '/login') {
+    if (authService.isAuthenticated()) {
+      // 已登录，跳转到首页或原定路径
+      const redirect = to.query.redirect || '/'
+      return next(redirect)
+    }
+    return next()
+  }
+
+  // 其他页面需要登录
+  if (!authService.isAuthenticated()) {
+    return next({ path: '/login', query: { redirect: to.fullPath } })
+  }
+
+  next()
 })
 
 export default router

@@ -5,6 +5,7 @@ from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .models import FinancialRecord, Department, Category, ProofImage
 from .serializers import (
@@ -20,6 +21,7 @@ class FinancialRecordViewSet(viewsets.ModelViewSet):
     """
     获取财务记录
     """
+    authentication_classes = [JWTAuthentication]
     queryset = FinancialRecord.objects.all()
 
     def get_serializer_class(self):
@@ -185,6 +187,7 @@ class ProofImageViewSet(viewsets.ModelViewSet):
     """
     凭证API
     """
+    authentication_classes = [JWTAuthentication]
     queryset = ProofImage.objects.all()
     serializer_class = ProofImageSerializer
 
@@ -283,6 +286,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     """
     获取部门
     """
+    authentication_classes = [JWTAuthentication]
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
 
@@ -346,5 +350,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
     """
     获取分类
     """
+    authentication_classes = [JWTAuthentication]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer

@@ -5,7 +5,7 @@
         <el-button type="text" class="menu-toggle mobile-only" @click="drawerVisible = true" aria-label="打开导航">
           <el-icon><Menu /></el-icon>
         </el-button>
-        <h1 class="logo">爱特工作室物品管理及财务管理系统</h1>
+        <h1 class="logo">爱特工作室管理系统</h1>
       </div>
       <el-menu
           mode="horizontal"

@@ -1,23 +1,24 @@
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 import json
 import re
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
 
 from .services import EmailNotificationService
 
 
-@csrf_exempt
-@require_http_methods(["POST", "GET"])
+@api_view(["GET", "POST"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def notification_settings(request):
-    """通知设置API"""
+    """通知设置API（需要JWT）"""
 
     if request.method == 'GET':
         try:
             settings_data = EmailNotificationService.get_notification_settings()
             all_emails = EmailNotificationService.get_all_notification_emails()
-            return JsonResponse({
+            return Response({
                 'success': True,
                 'data': {
                     'email_enabled': settings_data.get('email_enabled', False),
@@ -26,11 +27,11 @@ def notification_settings(request):
                 }
             })
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+            return Response({'success': False, 'error': str(e)}, status=500)
 
     elif request.method == 'POST':
         try:
-            data = json.loads(request.body)
+            data = request.data if hasattr(request, 'data') else json.loads(request.body or '{}')
             emails_to_update = data.get('notification_emails')
             email_enabled_status = data.get('email_enabled')
 
@@ -38,7 +39,7 @@ def notification_settings(request):
             was_updated = False
 
             # 1. 如果请求中包含 'notification_emails' 键，则处理邮箱列表
-            if emails_to_update is not None: # 允许 emails_to_update 为空列表 []
+            if emails_to_update is not None:  # 允许空列表
                 email_regex = re.compile(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
                 valid_emails_data = []
 
@@ -70,7 +71,7 @@ def notification_settings(request):
 
             # 执行更新成功，返回成功
             if was_updated:
-                return JsonResponse({
+                return Response({
                     'success': True,
                     'message': '通知设置已更新',
                     # 返回最新的数据状态
@@ -81,31 +82,31 @@ def notification_settings(request):
                 })
             else:
                 # 如果请求体为空或不包含任何有效键，则返回错误
-                return JsonResponse({'success': False, 'error': '未提供任何有效的更新数据'}, status=400)
+                return Response({'success': False, 'error': '未提供任何有效的更新数据'}, status=400)
 
-        except json.JSONDecodeError:
-            return JsonResponse({'success': False, 'error': '无效的JSON数据'}, status=400)
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+            return Response({'success': False, 'error': str(e)}, status=500)
 
-    return JsonResponse({'success': False, 'error': '不支持的请求方法'}, status=405)
+    return Response({'success': False, 'error': '不支持的请求方法'}, status=405)
 
-@csrf_exempt
-@require_http_methods(["POST"])
+
+@api_view(["POST"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def toggle_email_status(request):
-    """切换邮箱启用状态API"""
+    """切换邮箱启用状态API（需要JWT）"""
     try:
-        data = json.loads(request.body)
+        data = request.data if hasattr(request, 'data') else json.loads(request.body or '{}')
         email_id = data.get('email_id')
         is_enabled = data.get('is_enabled', True)
 
         if not email_id:
-            return JsonResponse({'success': False, 'error': '缺少邮箱ID'}, status=400)
+            return Response({'success': False, 'error': '缺少邮箱ID'}, status=400)
 
         success = EmailNotificationService.toggle_email_status(email_id, is_enabled)
 
         if success:
-            return JsonResponse({
+            return Response({
                 'success': True,
                 'message': f'邮箱状态已更新为{"启用" if is_enabled else "禁用"}',
                 'data': {
@@ -113,9 +114,7 @@ def toggle_email_status(request):
                 }
             })
         else:
-            return JsonResponse({'success': False, 'error': '更新邮箱状态失败'}, status=500)
+            return Response({'success': False, 'error': '更新邮箱状态失败'}, status=500)
 
-    except json.JSONDecodeError:
-        return JsonResponse({'success': False, 'error': '无效的JSON数据'}, status=400)
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+        return Response({'success': False, 'error': str(e)}, status=500)

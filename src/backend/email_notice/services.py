@@ -196,7 +196,7 @@ class EmailNotificationService:
             ])
             for it in data_items:
                 plain_lines.append(f"- {it['label']}: {it['value']}")
-            plain_lines.append("\n此邮件由爱特工作室物品管理及财务管理系统自动发送")
+            plain_lines.append("\n此邮件由爱特工作室管理系统自动发送")
             plain_message = "\n".join(plain_lines)
 
             # 发送邮件到所有启用的通知邮箱

@@ -3,6 +3,7 @@ from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .models import Item, ItemUsage, Category
 from .serializers import (
@@ -13,6 +14,7 @@ from .serializers import (
 
 class ItemViewSet(viewsets.ModelViewSet):
     """物品管理API"""
+    authentication_classes = [JWTAuthentication]
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
 
@@ -107,6 +109,7 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 class ItemUsageViewSet(viewsets.ModelViewSet):
     """使用记录管理API"""
+    authentication_classes = [JWTAuthentication]
     queryset = ItemUsage.objects.all()
     serializer_class = ItemUsageSerializer
 
@@ -130,11 +133,13 @@ class ItemUsageViewSet(viewsets.ModelViewSet):
 
 class CategoryViewSet(viewsets.ModelViewSet):
     """物品类别管理API"""
+    authentication_classes = [JWTAuthentication]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """用户管理API（只读）"""
+    authentication_classes = [JWTAuthentication]
     queryset = User.objects.all()
     serializer_class = UserSerializer
