@@ -32,38 +32,25 @@ class ItemSerializer(serializers.ModelSerializer):
             item=obj, is_returned=False
         ).first()
         if current_usage:
-            return UserSerializer(current_usage.user).data
+            return {
+                'username': current_usage.user,
+                'contact': current_usage.borrower_contact
+            }
         return None
 
 
 class ItemUsageSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    user_id = serializers.IntegerField(write_only=True)
-    item = ItemSerializer(read_only=True)
-    item_id = serializers.IntegerField(write_only=True)
+    item_name = serializers.CharField(source='item.name', read_only=True)
+    item_serial = serializers.CharField(source='item.serial_number', read_only=True)
 
     class Meta:
         model = ItemUsage
         fields = [
-            'id', 'item', 'item_id', 'user', 'user_id', 'start_time', 'end_time',
-            'purpose', 'notes', 'is_returned', 'condition_before', 'condition_after',
-            'created_at'
+            'id', 'item', 'item_name', 'item_serial', 'user', 'borrower_contact',
+            'start_time', 'end_time', 'purpose', 'notes', 'is_returned',
+            'condition_before', 'condition_after', 'expected_return_time', 'created_at'
         ]
-
-    def create(self, validated_data):
-        # 当创建新的使用记录时，更新物品状态为使用中
-        item = Item.objects.get(id=validated_data['item_id'])
-        item.status = 'in_use'
-        item.save()
-        return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        # 当归还物品时，更新物品状态为可用
-        if validated_data.get('is_returned', False) and not instance.is_returned:
-            item = instance.item
-            item.status = 'available'
-            item.save()
-        return super().update(instance, validated_data)
+        read_only_fields = ['created_at']
 
 
 class ItemDetailSerializer(ItemSerializer):

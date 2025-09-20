@@ -32,29 +32,23 @@ class ItemViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        user_id = request.data.get('user_id')
+        user_name = request.data.get('user_name')
+        user_contact = request.data.get('user_contact', '')
         purpose = request.data.get('purpose', '')
         notes = request.data.get('notes', '')
         condition_before = request.data.get('condition_before', '')
 
-        if not user_id:
+        if not user_name:
             return Response(
-                {'error': '请指定使用者'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            return Response(
-                {'error': '用户不存在'},
+                {'error': '请输入使用者姓名'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         # 创建使用记录
         usage = ItemUsage.objects.create(
             item=item,
-            user=user,
+            user=user_name,
+            borrower_contact=user_contact,
             start_time=timezone.now(),
             purpose=purpose,
             notes=notes,
@@ -125,13 +119,13 @@ class ItemUsageViewSet(viewsets.ModelViewSet):
 
     @action(detail=False)
     def by_user(self, request):
-        """根据用户ID获取使用记录"""
-        user_id = request.query_params.get('user_id')
-        if user_id:
-            usages = self.queryset.filter(user_id=user_id)
+        """根据用户姓名获取使用记录"""
+        user_name = request.query_params.get('user_name')
+        if user_name:
+            usages = self.queryset.filter(user__icontains=user_name)
             serializer = self.get_serializer(usages, many=True)
             return Response(serializer.data)
-        return Response({'error': '请提供用户ID'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': '请提供用户姓名'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

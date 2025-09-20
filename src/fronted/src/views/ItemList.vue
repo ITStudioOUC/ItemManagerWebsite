@@ -124,14 +124,10 @@
     <el-dialog v-model="showBorrowDialog" title="借用物品" width="500px">
       <el-form :model="borrowForm" label-width="100px">
         <el-form-item label="使用者">
-          <el-select v-model="borrowForm.user_id" placeholder="请选择使用者">
-            <el-option
-              v-for="user in users"
-              :key="user.id"
-              :label="user.username"
-              :value="user.id"
-            />
-          </el-select>
+          <el-input v-model="borrowForm.user_name" placeholder="请输入使用者姓名" />
+        </el-form-item>
+        <el-form-item label="联系方式">
+          <el-input v-model="borrowForm.user_contact" placeholder="请输入联系方式（可选）" />
         </el-form-item>
         <el-form-item label="使用目的">
           <el-input v-model="borrowForm.purpose" />
@@ -245,7 +241,8 @@ export default {
         owner: ''
       },
       borrowForm: {
-        user_id: null,
+        user_name: '',
+        user_contact: '',
         purpose: '',
         condition_before: '',
         notes: ''
@@ -333,7 +330,8 @@ export default {
     borrowItem(item) {
       this.currentItem = item
       this.borrowForm = {
-        user_id: null,
+        user_name: '',
+        user_contact: '',
         purpose: '',
         condition_before: '',
         notes: ''
@@ -382,8 +380,8 @@ export default {
       }
     },
     async confirmBorrow() {
-      if (!this.borrowForm.user_id) {
-        ElMessage.error('请选择使用者')
+      if (!this.borrowForm.user_name) {
+        ElMessage.error('请输入使用者姓名')
         return
       }
 

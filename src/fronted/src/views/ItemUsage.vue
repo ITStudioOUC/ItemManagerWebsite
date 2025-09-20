@@ -30,9 +30,9 @@
 
     <el-card>
       <el-table :data="filteredUsages" style="width: 100%" v-loading="loading">
-        <el-table-column prop="item.name" label="物品名称" />
-        <el-table-column prop="item.serial_number" label="序列号" />
-        <el-table-column prop="user.username" label="使用者" />
+        <el-table-column prop="item_name" label="物品名称" />
+        <el-table-column prop="item_serial" label="序列号" />
+        <el-table-column prop="user" label="使用者" />
         <el-table-column prop="start_time" label="开始时间" width="160">
           <template #default="scope">
             {{ formatDate(scope.row.start_time) }}
@@ -85,19 +85,15 @@
           <el-col :span="12">
             <h3>物品信息</h3>
             <el-descriptions :column="1" border>
-              <el-descriptions-item label="物品名称">{{ selectedUsage.item.name }}</el-descriptions-item>
-              <el-descriptions-item label="序列号">{{ selectedUsage.item.serial_number }}</el-descriptions-item>
-              <el-descriptions-item label="类别">{{ selectedUsage.item.category }}</el-descriptions-item>
+              <el-descriptions-item label="物品名称">{{ selectedUsage.item_name }}</el-descriptions-item>
+              <el-descriptions-item label="序列号">{{ selectedUsage.item_serial }}</el-descriptions-item>
             </el-descriptions>
           </el-col>
           <el-col :span="12">
             <h3>使用者信息</h3>
             <el-descriptions :column="1" border>
-              <el-descriptions-item label="用户名">{{ selectedUsage.user.username }}</el-descriptions-item>
-              <el-descriptions-item label="姓名">
-                {{ selectedUsage.user.first_name }} {{ selectedUsage.user.last_name }}
-              </el-descriptions-item>
-              <el-descriptions-item label="邮箱">{{ selectedUsage.user.email }}</el-descriptions-item>
+              <el-descriptions-item label="使用者">{{ selectedUsage.user }}</el-descriptions-item>
+              <el-descriptions-item label="联系方式">{{ selectedUsage.borrower_contact }}</el-descriptions-item>
             </el-descriptions>
           </el-col>
         </el-row>

@@ -115,14 +115,18 @@
             <span>当前使用中的物品</span>
           </template>
           <el-table :data="currentUsages" style="width: 100%" max-height="300">
-            <el-table-column prop="item.name" label="物品名称" />
-            <el-table-column prop="user.username" label="使用者" />
+            <el-table-column prop="item_name" label="物品名称" />
+            <el-table-column prop="user" label="使用者" />
             <el-table-column prop="start_time" label="开始时间">
               <template #default="scope">
                 {{ formatDate(scope.row.start_time) }}
               </template>
             </el-table-column>
-            <el-table-column prop="purpose" label="使用目的" />
+            <el-table-column prop="purpose" label="使用目的">
+              <template #default="scope">
+                {{ scope.row.purpose || '无' }}
+              </template>
+            </el-table-column>
           </el-table>
         </el-card>
       </el-col>

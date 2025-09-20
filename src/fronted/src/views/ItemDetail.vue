@@ -80,9 +80,8 @@
             <span>当前使用者</span>
           </template>
           <el-descriptions :column="3" border>
-            <el-descriptions-item label="使用者">{{ item.current_user.username }}</el-descriptions-item>
-            <el-descriptions-item label="姓名">{{ item.current_user.first_name }} {{ item.current_user.last_name }}</el-descriptions-item>
-            <el-descriptions-item label="邮箱">{{ item.current_user.email }}</el-descriptions-item>
+            <el-descriptions-item label="使用者姓名">{{ item.current_user.username }}</el-descriptions-item>
+            <el-descriptions-item label="联系方式">{{ item.current_user.contact }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
 
@@ -125,14 +124,15 @@
     <el-dialog v-model="showUsageDialog" title="使用记录详情" width="600px">
       <div v-if="selectedUsage">
         <el-descriptions :column="2" border>
-          <el-descriptions-item label="使用者">{{ selectedUsage.user.username }}</el-descriptions-item>
-          <el-descriptions-item label="使用目的">{{ selectedUsage.purpose }}</el-descriptions-item>
+          <el-descriptions-item label="使用者">{{ selectedUsage.user }}</el-descriptions-item>
+          <el-descriptions-item label="联系方式">{{ selectedUsage.borrower_contact }}</el-descriptions-item>
           <el-descriptions-item label="开始时间">{{ formatDate(selectedUsage.start_time) }}</el-descriptions-item>
           <el-descriptions-item label="结束时间">
             {{ selectedUsage.end_time ? formatDate(selectedUsage.end_time) : '使用中' }}
           </el-descriptions-item>
           <el-descriptions-item label="使用前状况">{{ selectedUsage.condition_before || '无' }}</el-descriptions-item>
           <el-descriptions-item label="使用后状况">{{ selectedUsage.condition_after || '无' }}</el-descriptions-item>
+          <el-descriptions-item label="使用目的">{{ selectedUsage.notes || '无' }}</el-descriptions-item>
           <el-descriptions-item label="备注" :span="2">{{ selectedUsage.notes || '无' }}</el-descriptions-item>
         </el-descriptions>
       </div>
