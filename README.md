@@ -53,3 +53,8 @@ apt install python3.x-venv # 其实就是安装 venv 包，x 是你的 python3 �
 ```
 
 并且注意，在第一次启动前，需要在 `src/backend/item_manager` 中手动创建 secure.json 并将 `SECRET_KEY` 和 `SMTP` 填入，否则无法启动
+
+# 注意
+
+- 如果需要使用 MySQL/MariaDB 作为数据库，请在 `src/backend/item_manager/settings.py` 中修改数据库配置，并且填写 `secure.json` 中的数据库信息
+- 如果需要自定义登录背景图，请修改源代码，`src/frontend/src/views/Login.vue` 中的 `backgroundImage` 字段，并将背景图放到 `src/frontend/public/_images/` 目录下
