@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import json
+import os
 # SECURE 文件用来存储敏感信息，如 SECRET_KEY，SMTP信息 等
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -174,6 +175,13 @@ ADMINS = SECURE["SMTP"]["ADMINS"]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# 确保日志目录存在
+LOGS_DIR = BASE_DIR / 'logs'
+if not os.path.exists(LOGS_DIR):
+    os.makedirs(LOGS_DIR)
+
 # 日志配置
 LOGGING = {
     'version': 1,
@@ -192,7 +200,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'scheduler.log',
+            'filename': LOGS_DIR / 'scheduler.log',
             'formatter': 'verbose',
         },
         'console': {
@@ -209,4 +217,3 @@ LOGGING = {
         },
     },
 }
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
