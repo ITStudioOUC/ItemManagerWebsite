@@ -1,8 +1,9 @@
 import logging
+
 from apscheduler.schedulers.background import BackgroundScheduler
+from django_apscheduler import util
 from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
-from django_apscheduler import util
 from personnel.models import Personnel
 
 logger = logging.getLogger(__name__)

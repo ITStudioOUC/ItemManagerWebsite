@@ -1,17 +1,19 @@
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter, OrderingFilter
-from django.utils import timezone
 import logging
+
+from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.response import Response
+
+from .filters import PersonnelFilter
 from .models import Personnel, ProjectGroup
 from .serializers import (
     PersonnelReadSerializer,
     PersonnelWriteSerializer,
     ProjectGroupSerializer
 )
-from .filters import PersonnelFilter
 
 logger = logging.getLogger(__name__)
 
@@ -109,18 +111,23 @@ class PersonnelViewSet(viewsets.ModelViewSet):
         personnel = self.get_object()
         personnel_data = {
             'id': personnel.id,
-            'name': personnel.name,
+            'name': "[已删除]" + personnel.name,
             'student_id': personnel.student_id,
-            'email': personnel.email,
-            'phone': personnel.phone,
-            'department_name': personnel.department.name if personnel.department else '',
-            'project_group_name': personnel.project_group.name if personnel.project_group else '',
+            'gender': personnel.gender,
+            'grader_major': personnel.grade_major,
+            'department': personnel.department.name,
+            'project_group': personnel.project_group,
             'position': personnel.position,
+            'start_date': personnel.start_date,
+            'end_date': personnel.end_date,
             'is_active': personnel.is_active,
-            'start_date': str(personnel.start_date),
-            'end_date': str(personnel.end_date) if personnel.end_date else '',
-            'timestamp': timezone.now().isoformat(),
-
+            'phone': personnel.phone,
+            'qq': personnel.qq,
+            'email': personnel.email,
+            'description': personnel.description,
+            'timestamp': personnel.updated_at,
+            'operation_path': request.path,
+            'operation_method': request.method
         }
 
         # 获取用户信息
@@ -210,7 +217,7 @@ class ProjectGroupViewSet(viewsets.ModelViewSet):
         project_group = self.get_object()
         project_group_data = {
             'id': project_group.id,
-            'name': project_group.name,
+            'name': "[已删除]" + project_group.name,
             'department_name': project_group.department.name if project_group.department else '',
             'description': project_group.description,
             'created_at': str(project_group.created_at),

@@ -113,9 +113,9 @@
 </template>
 
 <script>
-import { financeService, projectGroupService } from '@/services/api'
+import {financeService, projectGroupService} from '@/services/api'
 import AppHeader from '@/components/AppHeader.vue'
-import { Plus } from '@element-plus/icons-vue'
+import {Plus} from '@element-plus/icons-vue'
 
 export default {
   name: 'DepartmentProjectGroupManagement',

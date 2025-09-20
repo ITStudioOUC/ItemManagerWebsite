@@ -19,7 +19,6 @@
           <el-select v-model="form.gender" placeholder="请选择性别">
             <el-option label="男" value="male" />
             <el-option label="女" value="female" />
-            <el-option label="其他" value="other" />
           </el-select>
         </el-form-item>
       </el-col>
@@ -129,7 +128,7 @@
 </template>
 
 <script>
-import { personnelService } from '@/services/api'
+import {personnelService} from '@/services/api'
 
 export default {
   name: 'PersonnelForm',

@@ -1,9 +1,11 @@
 import os
 import threading
+
+from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.utils import timezone
+
 from .models import FinancialRecord, Department, Category, ProofImage
 from .serializers import (
     FinancialRecordWriteSerializer,
@@ -12,6 +14,7 @@ from .serializers import (
     CategorySerializer,
     ProofImageSerializer
 )
+
 
 class FinancialRecordViewSet(viewsets.ModelViewSet):
     """
@@ -139,6 +142,39 @@ class FinancialRecordViewSet(viewsets.ModelViewSet):
             )
             created_images.append(ProofImageSerializer(proof_image).data)
 
+        # 异步发送凭证上传通知邮件
+        def send_proof_upload_notification():
+            try:
+                from email_notice.services import EmailNotificationService
+
+                user_info = self._get_user_info(request)
+
+                # 构建凭证更新通知数据
+                notification_data = {
+                    'record_id': record.id,
+                    'record_title': record.title,
+                    'record_amount': str(record.amount),
+                    'uploaded_images_count': len(created_images),
+                    'timestamp': timezone.now().isoformat(),
+                    'operation_type': '凭证上传',
+                    'operation_path': request.path,
+                    'operation_method': request.method
+                }
+
+                # 发送凭证更新通知
+                EmailNotificationService.send_operation_notification(
+                    'UPDATE', '财务凭证', notification_data, user_info
+                )
+                print(f"凭证上传通知邮件已发送: 财务记录 ID:{record.id}, 上传{len(created_images)}张图片")
+
+            except Exception as e:
+                print(f"发送凭证上传通知邮件失败: {e}")
+
+        # 启动异步邮件发送线程
+        email_thread = threading.Thread(target=send_proof_upload_notification)
+        email_thread.daemon = True
+        email_thread.start()
+
         return Response({
             'message': f'成功上传 {len(created_images)} 张图片',
             'images': created_images
@@ -153,8 +189,18 @@ class ProofImageViewSet(viewsets.ModelViewSet):
     serializer_class = ProofImageSerializer
 
     def destroy(self, request, *args, **kwargs):
-        """重写删除方法，确保删除图片记录时同时删除物理文件"""
+        """删除方法，确保删除图片记录时同时删除物理文件，并发送邮件通知"""
         instance = self.get_object()
+
+        # 获取凭证信息用于邮件通知
+        proof_info = {
+            'id': instance.id,
+            'record_id': instance.financial_record.id,
+            'record_title': instance.financial_record.title,
+            'record_amount': str(instance.financial_record.amount),
+            'image_description': instance.description,
+            'timestamp': timezone.now().isoformat(),
+        }
 
         # 获取文件路径
         file_path = None
@@ -177,7 +223,60 @@ class ProofImageViewSet(viewsets.ModelViewSet):
                 print(f"删除文件失败: {file_path}, 错误: {e}")
                 # 即使文件删除失败，也不抛出异常，因为数据库记录已经删除
 
+        # 异步发送凭证删除通知邮件
+        def send_proof_delete_notification():
+            try:
+                from email_notice.services import EmailNotificationService
+
+                user_info = self._get_user_info(request)
+
+                # 构建凭证删除通知数据
+                notification_data = {
+                    'proof_id': proof_info['id'],
+                    'record_id': proof_info['record_id'],
+                    'record_title': proof_info['record_title'],
+                    'record_amount': proof_info['record_amount'],
+                    'image_description': proof_info['image_description'],
+                    'timestamp': proof_info['timestamp'],
+                    'operation_type': '凭证删除',
+                    'operation_path': request.path,
+                    'operation_method': request.method
+                }
+
+                # 发送凭证删除通知
+                EmailNotificationService.send_operation_notification(
+                    'DELETE', '财务凭证', notification_data, user_info
+                )
+                print(f"凭证删除通知邮件已发送: 财务记录 ID:{proof_info['record_id']}, 凭证 ID:{proof_info['id']}")
+
+            except Exception as e:
+                print(f"发送凭证删除通知邮件失败: {e}")
+
+        # 启动异步邮件发送线程
+        email_thread = threading.Thread(target=send_proof_delete_notification)
+        email_thread.daemon = True
+        email_thread.start()
+
         return Response({'message': '图片删除成功'}, status=status.HTTP_200_OK)
+
+    def _get_user_info(self, request):
+        """获取用户信息"""
+        try:
+            if hasattr(request, 'user') and request.user.is_authenticated:
+                return f"{request.user.username} ({request.user.email})"
+            else:
+                return f"匿名用户 (IP: {self._get_client_ip(request)})"
+        except:
+            return "未知用户"
+
+    def _get_client_ip(self, request):
+        """获取客户端IP"""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
 
 
 class DepartmentViewSet(viewsets.ModelViewSet):

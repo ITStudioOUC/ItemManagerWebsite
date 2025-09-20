@@ -1,7 +1,8 @@
 from django.test import TestCase
-from django.core import mail
-from .models import NotificationEmail, NotificationSettings
+
+from .models import NotificationEmail
 from .services import EmailNotificationService
+
 
 class EmailNotificationTestCase(TestCase):
     def setUp(self):

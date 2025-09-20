@@ -145,8 +145,8 @@
 </template>
 
 <script>
-import { usageService, userService } from '@/services/api'
-import { ElMessage } from 'element-plus'
+import {usageService, userService} from '@/services/api'
+import {ElMessage} from 'element-plus'
 import moment from 'moment'
 import AppHeader from '../components/AppHeader.vue'
 

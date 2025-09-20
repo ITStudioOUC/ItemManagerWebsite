@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from pathlib import Path
 import json
 import os
+from pathlib import Path
+
 # SECURE 文件用来存储敏感信息，如 SECRET_KEY，SMTP信息 等
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

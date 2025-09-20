@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 import Login from '../views/Login.vue'
 import ItemList from '../views/ItemList.vue'
 import ItemDetail from '../views/ItemDetail.vue'

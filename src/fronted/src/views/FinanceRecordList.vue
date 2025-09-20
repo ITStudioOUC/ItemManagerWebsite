@@ -133,10 +133,10 @@
 </template>
 
 <script>
-import { financeService } from '@/services/api';
+import {financeService} from '@/services/api';
 import FinanceRecordForm from './FinanceRecordForm.vue';
 import AppHeader from "@/components/AppHeader.vue";
-import { Search } from '@element-plus/icons-vue';
+import {Search} from '@element-plus/icons-vue';
 
 export default {
   name: 'FinanceRecordList',

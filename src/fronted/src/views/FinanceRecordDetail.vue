@@ -142,8 +142,8 @@
 </template>
 
 <script>
-import { financeService, API_BASE_URL_WITHOUT_API } from '@/services/api';
-import { Plus, Delete } from '@element-plus/icons-vue';
+import {API_BASE_URL_WITHOUT_API, financeService} from '@/services/api';
+import {Delete, Plus} from '@element-plus/icons-vue';
 import AppHeader from "@/components/AppHeader.vue";
 import FinanceRecordForm from './FinanceRecordForm.vue';
 

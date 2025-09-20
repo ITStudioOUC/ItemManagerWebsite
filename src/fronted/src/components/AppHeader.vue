@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { House, Box, Document, Money, Tickets, Setting, User, OfficeBuilding } from '@element-plus/icons-vue'
+import {Box, Document, House, Money, OfficeBuilding, Setting, Tickets, User} from '@element-plus/icons-vue'
 
 export default {
   name: 'AppHeader',

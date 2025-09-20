@@ -1,5 +1,6 @@
-from django.db import models
 from django.core.validators import EmailValidator
+from django.db import models
+
 
 class NotificationEmail(models.Model):
     """通知邮箱模型"""

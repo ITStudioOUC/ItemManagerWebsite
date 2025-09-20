@@ -166,12 +166,12 @@
 </template>
 
 <script>
-import { personnelService, projectGroupService, financeService } from '@/services/api'
+import {financeService, personnelService, projectGroupService} from '@/services/api'
 import AppHeader from '@/components/AppHeader.vue'
 import PersonnelForm from './PersonnelForm.vue'
 import PersonnelDetail from './PersonnelDetail.vue'
 import PersonnelStatistics from './PersonnelStatistics.vue'
-import { Search, Plus, DataAnalysis } from '@element-plus/icons-vue'
+import {DataAnalysis, Plus, Search} from '@element-plus/icons-vue'
 
 export default {
   name: 'PersonnelList',

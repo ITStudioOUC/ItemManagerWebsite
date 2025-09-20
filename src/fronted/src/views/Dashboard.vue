@@ -158,7 +158,7 @@
 </template>
 
 <script>
-import { itemService, usageService } from '../services/api'
+import {itemService, usageService} from '../services/api'
 import moment from 'moment'
 import AppHeader from '../components/AppHeader.vue'
 

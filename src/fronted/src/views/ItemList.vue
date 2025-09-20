@@ -122,12 +122,12 @@
 
     <!-- 借用物品对话框 -->
     <el-dialog v-model="showBorrowDialog" title="借用物品" width="500px">
-      <el-form :model="borrowForm" label-width="100px">
-        <el-form-item label="使用者">
+      <el-form :model="borrowForm" :rules="borrowRules" ref="borrowForm" label-width="100px">
+        <el-form-item label="使用者" prop="user_name">
           <el-input v-model="borrowForm.user_name" placeholder="请输入使用者姓名" />
         </el-form-item>
-        <el-form-item label="联系方式">
-          <el-input v-model="borrowForm.user_contact" placeholder="请输入联系方式（可选）" />
+        <el-form-item label="联系方式" prop="user_contact">
+          <el-input v-model="borrowForm.user_contact" placeholder="请输入联系方式（手机号/QQ/微信/邮箱等）" />
         </el-form-item>
         <el-form-item label="使用目的">
           <el-input v-model="borrowForm.purpose" />
@@ -147,12 +147,12 @@
 
     <!-- 归还物品对话框 -->
     <el-dialog v-model="showReturnDialog" title="归还物品" width="500px">
-      <el-form :model="returnForm" label-width="100px">
-        <el-form-item label="使用后状况">
-          <el-input v-model="returnForm.condition_after" />
+      <el-form :model="returnForm" :rules="returnRules" ref="returnForm" label-width="100px">
+        <el-form-item label="使用后状况" prop="condition_after">
+          <el-input v-model="returnForm.condition_after" placeholder="请描述物品使用后的状况" />
         </el-form-item>
         <el-form-item label="归还备注">
-          <el-input type="textarea" v-model="returnForm.return_notes" />
+          <el-input type="textarea" v-model="returnForm.return_notes" placeholder="可填写其他归还说明（可选）" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -209,8 +209,8 @@
 </template>
 
 <script>
-import { itemService, userService } from '../services/api'
-import { ElMessage } from 'element-plus'
+import {itemService, userService} from '../services/api'
+import {ElMessage} from 'element-plus'
 import AppHeader from '../components/AppHeader.vue'
 
 export default {
@@ -267,6 +267,13 @@ export default {
         name: [{ required: true, message: '请输入物品名称', trigger: 'blur' }],
         serial_number: [{ required: true, message: '请输入序列号', trigger: 'blur' }],
         category: [{ required: true, message: '请输入类别', trigger: 'blur' }]
+      },
+      returnRules: {
+        condition_after: [{ required: true, message: '请输入使用后状况', trigger: 'blur' }]
+      },
+      borrowRules: {
+        user_name: [{ required: true, message: '请输入使用者姓名', trigger: 'blur' }],
+        user_contact: [{ required: true, message: '请输入联系方式', trigger: 'blur' }]
       }
     }
   },
@@ -380,28 +387,33 @@ export default {
       }
     },
     async confirmBorrow() {
-      if (!this.borrowForm.user_name) {
-        ElMessage.error('请输入使用者姓名')
-        return
-      }
-
       try {
+        await this.$refs.borrowForm.validate()
+
         await itemService.borrowItem(this.currentItem.id, this.borrowForm)
         ElMessage.success('借用成功')
         this.showBorrowDialog = false
         await this.loadItems()
       } catch (error) {
+        if (error.message && error.message.includes('validation')) {
+          return
+        }
         console.error('借用失败:', error)
         ElMessage.error('借用失败')
       }
     },
     async confirmReturn() {
       try {
+        await this.$refs.returnForm.validate()
+
         await itemService.returnItem(this.currentItem.id, this.returnForm)
         ElMessage.success('归还成功')
         this.showReturnDialog = false
         await this.loadItems()
       } catch (error) {
+        if (error.message && error.message.includes('validation')) {
+          return
+        }
         console.error('归还失败:', error)
         ElMessage.error('归还失败')
       }

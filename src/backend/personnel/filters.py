@@ -1,7 +1,7 @@
 import django_filters
-from django.db import models
-from .models import Personnel, ProjectGroup
 from finance.models import Department
+
+from .models import Personnel, ProjectGroup
 
 
 class PersonnelFilter(django_filters.FilterSet):

@@ -1,5 +1,7 @@
 from django.contrib import admin
+
 from .models import NotificationEmail, NotificationSettings
+
 
 @admin.register(NotificationEmail)
 class NotificationEmailAdmin(admin.ModelAdmin):

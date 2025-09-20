@@ -171,11 +171,11 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { Message, InfoFilled, Plus, Delete } from '@element-plus/icons-vue'
+import {onMounted, ref} from 'vue'
+import {ElMessage} from 'element-plus'
+import {Delete, InfoFilled, Message, Plus} from '@element-plus/icons-vue'
 import AppHeader from '@/components/AppHeader.vue'
-import { API_BASE_URL_WITHOUT_API } from '@/services/api'
+import {API_BASE_URL_WITHOUT_API} from '@/services/api'
 
 export default {
   name: 'Settings',

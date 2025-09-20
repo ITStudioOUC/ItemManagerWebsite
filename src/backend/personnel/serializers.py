@@ -1,6 +1,7 @@
-from rest_framework import serializers
-from .models import Personnel, ProjectGroup
 from finance.models import Department
+from rest_framework import serializers
+
+from .models import Personnel, ProjectGroup
 
 
 class ProjectGroupSerializer(serializers.ModelSerializer):

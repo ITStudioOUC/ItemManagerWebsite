@@ -1,10 +1,10 @@
-from django.utils.deprecation import MiddlewareMixin
-from django.http import JsonResponse
-from .services import EmailNotificationService
 import json
 import logging
 import threading
-from django.core.exceptions import ObjectDoesNotExist
+
+from django.utils.deprecation import MiddlewareMixin
+
+from .services import EmailNotificationService
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +20,10 @@ class EmailNotificationMiddleware(MiddlewareMixin):
         try:
             # 只处理API请求
             if not request.path.startswith('/api/'):
+                return response
+
+            # 排除凭证相关的API路径，这些已经在视图中单独处理
+            if  '/proof-images/' in request.path :
                 return response
 
             # 只处理数据新增修改操作，但排除DELETE操作，毕竟删除操作已经另外重写
@@ -93,10 +97,25 @@ class EmailNotificationMiddleware(MiddlewareMixin):
                 notification_data = {
                     'id': item_data.get('id', ''),
                     'name': item_data.get('name', ''),
+                    'item_name': item_data.get('item_name', ''),
+                    'item_serial': item_data.get('item_serial', ''),
                     'serial_number': item_data.get('serial_number', ''),
-                    'status': item_data.get('status', ''),
                     'category': item_data.get('category', ''),
+                    'status': item_data.get('status', ''),
+                    'location': item_data.get('location', ''),
+                    'description': item_data.get('description', ''),
                     'owner': item_data.get('owner', ''),
+                    'purchase_date': item_data.get('purchase_date', ''),
+                    'value': item_data.get('value', ''),
+                    'user': item_data.get('user', ''),
+                    'borrower_contact': item_data.get('borrower_contact', ''),
+                    'start_time': item_data.get('start_time', ''),
+                    'end_time': item_data.get('end_time', ''),
+                    'purpose': item_data.get('purpose', ''),
+                    'notes': item_data.get('notes', ''),
+                    'is_returned': item_data.get('is_returned', ''),
+                    'condition_before': item_data.get('condition_before', ''),
+                    'condition_after': item_data.get('condition_after', ''),
                     'timestamp': item_data.get('updated_at', ''),
                     'operation_path': request.path,
                     'operation_method': request.method
@@ -181,8 +200,11 @@ class EmailNotificationMiddleware(MiddlewareMixin):
                     personnel_data = {}
 
                 # 构建通知数据，使用正确的字段名
-                message = personnel_data['message', '']
-                personnel_data = personnel_data['data', '']
+                message = ''
+                if 'message' in personnel_data:
+                    message = personnel_data['message', '']
+                if 'data' in personnel_data:
+                    personnel_data = personnel_data['data', '']
                 notification_data = {
                     'message': message,
                     'id': personnel_data.get('id', ''),
@@ -192,6 +214,7 @@ class EmailNotificationMiddleware(MiddlewareMixin):
                     'grader_major': personnel_data.get('grade_major', ''),
                     'department': personnel_data.get('department', ''),
                     'project_group': personnel_data.get('project_group', ''),
+                    'project_group_name': personnel_data.get('project_group_name', ''),
                     'position': personnel_data.get('position', ''),
                     'start_date': personnel_data.get('start_date', ''),
                     'end_date': personnel_data.get('end_date', ''),

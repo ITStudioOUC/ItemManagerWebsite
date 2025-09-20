@@ -106,9 +106,9 @@
 </template>
 
 <script>
-import { financeService } from '@/services/api';
+import {financeService} from '@/services/api';
 import * as echarts from 'echarts';
-import { TrendCharts, Money, Wallet, Document } from '@element-plus/icons-vue';
+import {Document, Money, TrendCharts, Wallet} from '@element-plus/icons-vue';
 import AppHeader from '@/components/AppHeader.vue';
 
 export default {

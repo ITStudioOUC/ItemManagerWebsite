@@ -91,7 +91,7 @@
             <span>使用历史</span>
           </template>
           <el-table :data="item.usage_history" style="width: 100%">
-            <el-table-column prop="user.username" label="使用者" />
+            <el-table-column prop="user" label="使用者" />
             <el-table-column prop="start_time" label="开始时间">
               <template #default="scope">
                 {{ formatDate(scope.row.start_time) }}
@@ -141,8 +141,8 @@
 </template>
 
 <script>
-import { itemService } from '@/services/api'
-import { ElMessage } from 'element-plus'
+import {itemService} from '@/services/api'
+import {ElMessage} from 'element-plus'
 import AppHeader from '../components/AppHeader.vue'
 import moment from 'moment'
 
