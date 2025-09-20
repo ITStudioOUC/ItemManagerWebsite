@@ -201,10 +201,17 @@ class EmailNotificationMiddleware(MiddlewareMixin):
 
                 # 构建通知数据，使用正确的字段名
                 message = ''
-                if 'message' in personnel_data:
-                    message = personnel_data['message', '']
-                if 'data' in personnel_data:
-                    personnel_data = personnel_data['data', '']
+                if isinstance(personnel_data, dict):
+                    message = personnel_data.get('message', '')
+                    inner = personnel_data.get('data')
+                    if isinstance(inner, dict):
+                        personnel_data = inner
+                elif isinstance(personnel_data, list) and personnel_data:
+                    first = personnel_data[0]
+                    personnel_data = first if isinstance(first, dict) else {}
+                else:
+                    personnel_data = {}
+
                 notification_data = {
                     'message': message,
                     'id': personnel_data.get('id', ''),
