@@ -44,15 +44,6 @@ class PersonnelWriteSerializer(serializers.ModelSerializer):
             'is_active', 'phone', 'qq', 'email', 'description'
         ]
 
-    def validate_student_id(self, value):
-        """验证学号唯一性"""
-        if self.instance and self.instance.student_id == value:
-            return value
-
-        if Personnel.objects.filter(student_id=value).exists():
-            raise serializers.ValidationError("该学号已存在")
-        return value
-
     def validate_project_group(self, value):
         """验证项目组是否属于选定的部门"""
         if value and hasattr(self, 'initial_data'):

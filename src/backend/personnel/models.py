@@ -5,7 +5,7 @@ from finance.models import Department
 
 class ProjectGroup(models.Model):
     """项目组模型"""
-    name = models.CharField(max_length=100, unique=True, verbose_name="项目组名称")
+    name = models.CharField(max_length=100, verbose_name="项目组名称")
     department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name="所属部门")
     description = models.TextField(blank=True, null=True, verbose_name="项目组描述")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
@@ -30,7 +30,6 @@ class Personnel(models.Model):
     name = models.CharField(max_length=50, verbose_name="姓名")
     student_id = models.CharField(
         max_length=20,
-        unique=True,
         verbose_name="学号",
         validators=[RegexValidator(
             regex=r'^\d{8,12}$',

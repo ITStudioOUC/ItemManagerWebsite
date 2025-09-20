@@ -295,7 +295,7 @@ export default {
         );
 
         // 构建详细信息
-        let detailInfo = `<div style="max-width: 400px;">
+        let detailInfo = `<div>
           <h3 style="margin: 0 0 15px 0; color: #409eff;">${date} - ${seriesName}</h3>
           <p style="margin: 0 0 10px 0; font-size: 18px; font-weight: bold; color: ${seriesName === '收入' ? '#67c23a' : '#f56c6c'};">
             总计: ¥${value.toFixed(2)}
@@ -328,7 +328,7 @@ export default {
           showClose: true,
           closeOnClickModal: true,
           closeOnPressEscape: true
-        });
+        }).catch(() => { /* 关闭时不做操作，否则会炸 */ });
       });
 
       // 添加鼠标悬停时显示数据标签
