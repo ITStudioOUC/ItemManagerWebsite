@@ -92,9 +92,9 @@ export const usageService = {
     return apiClient.get('/usages/current/')
   },
 
-  // 根据用户获取使用记录
-  getUserUsages(userId) {
-    return apiClient.get(`/usages/by_user/?user_id=${userId}`)
+  // 根据用户姓名获取使用记录
+  getUserUsages(userName) {
+    return apiClient.get(`/usages/by_user/?user_name=${userName}`)
   },
 
   // 创建使用记录
@@ -190,8 +190,128 @@ export const financeService = {
         return apiClient.get('/departments/')
     },
 
+    // 创建部门
+    createDepartment(department) {
+        return apiClient.post('/departments/', department)
+    },
+
+    // 更新部门
+    updateDepartment(id, department) {
+        return apiClient.put(`/departments/${id}/`, department)
+    },
+
+    // 删除部门
+    deleteDepartment(id) {
+        return apiClient.delete(`/departments/${id}/`)
+    },
+
     // 获取所有类别
     getAllCategories() {
         return apiClient.get('/finance_categories/')
     },
 }
+
+// 人员管理服务
+export const personnelService = {
+    // 获取所有人员
+    getAllPersonnel() {
+        return apiClient.get('/personnel/')
+    },
+
+    // 获取人员详情
+    getPersonnelDetail(id) {
+        return apiClient.get(`/personnel/${id}/`)
+    },
+
+    // 创建新人员
+    createPersonnel(personnel) {
+        return apiClient.post('/personnel/', personnel)
+    },
+
+    // 更新人员信息
+    updatePersonnel(id, personnel) {
+        return apiClient.put(`/personnel/${id}/`, personnel)
+    },
+
+    // 删除人员
+    deletePersonnel(id) {
+        return apiClient.delete(`/personnel/${id}/`)
+    },
+
+    // 设置人员已卸任
+    setPersonnelInactive(id) {
+        return apiClient.post(`/personnel/${id}/set_inactive/`)
+    },
+
+    // 设置人员在职
+    setPersonnelActive(id) {
+        return apiClient.post(`/personnel/${id}/set_active/`)
+    },
+
+    // 获取人员统计信息
+    getPersonnelStatistics() {
+        return apiClient.get('/personnel/statistics/')
+    },
+
+    // 按部门筛选人员
+    getPersonnelByDepartment(departmentId) {
+        return apiClient.get('/personnel/', {
+            params: { department: departmentId }
+        })
+    },
+
+    // 按项目组筛选人员
+    getPersonnelByProjectGroup(projectGroupId) {
+        return apiClient.get('/personnel/', {
+            params: { project_group: projectGroupId }
+        })
+    },
+
+    // 搜索人员
+    searchPersonnel(keyword) {
+        return apiClient.get('/personnel/', {
+            params: { search: keyword }
+        })
+    },
+
+    // 检查并更新到期人员状态
+    checkExpiredPersonnel() {
+        return apiClient.post('/personnel/check_expired/')
+    }
+}
+
+// 项目组管理服务
+export const projectGroupService = {
+    // 获取所有项目组
+    getAllProjectGroups() {
+        return apiClient.get('/project-groups/')
+    },
+
+    // 获取项目组详情
+    getProjectGroupDetail(id) {
+        return apiClient.get(`/project-groups/${id}/`)
+    },
+
+    // 创建新项目组
+    createProjectGroup(projectGroup) {
+        return apiClient.post('/project-groups/', projectGroup)
+    },
+
+    // 更新项目组
+    updateProjectGroup(id, projectGroup) {
+        return apiClient.put(`/project-groups/${id}/`, projectGroup)
+    },
+
+    // 删除项目组
+    deleteProjectGroup(id) {
+        return apiClient.delete(`/project-groups/${id}/`)
+    },
+
+    // 按部门获取项目组
+    getProjectGroupsByDepartment(departmentId) {
+        return apiClient.get('/project-groups/by_department/', {
+            params: { department_id: departmentId }
+        })
+    }
+}
+

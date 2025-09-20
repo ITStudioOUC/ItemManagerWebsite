@@ -15,7 +15,7 @@ from .serializers import (
 
 class FinancialRecordViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows financial records to be viewed or edited.
+    获取财务记录
     """
     queryset = FinancialRecord.objects.all()
 
@@ -56,6 +56,7 @@ class FinancialRecordViewSet(viewsets.ModelViewSet):
             'description': instance.description,
             'record_type': instance.record_type,
             'transaction_date': str(instance.transaction_date),
+            'timestamp': timezone.now().isoformat(),
             'department': instance.department.name if instance.department else '',
             'category': instance.category.name if instance.category else '',
             'fund_manager': instance.fund_manager if hasattr(instance, 'fund_manager') else ''
@@ -76,7 +77,6 @@ class FinancialRecordViewSet(viewsets.ModelViewSet):
         # 立即删除财务记录（会级联删除相关的凭证图片记录）
         super().destroy(request, *args, **kwargs)
 
-        # 异步发送删除通知邮件
         def send_delete_notification():
             """异步发送删除通知邮件"""
             try:
@@ -96,7 +96,7 @@ class FinancialRecordViewSet(viewsets.ModelViewSet):
                     'category': record_info['category'],
                     'fund_manager': record_info['fund_manager'],
                     'transaction_date': record_info['transaction_date'],
-                    'deleted_at': timezone.now().isoformat(),
+                    'timestamp': timezone.now().isoformat(), # 删除条目的时间 :(
                     'operation_path': request.path,
                     'operation_method': request.method
                 }
@@ -147,7 +147,7 @@ class FinancialRecordViewSet(viewsets.ModelViewSet):
 
 class ProofImageViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows proof images to be viewed or edited.
+    凭证API
     """
     queryset = ProofImage.objects.all()
     serializer_class = ProofImageSerializer
@@ -182,15 +182,70 @@ class ProofImageViewSet(viewsets.ModelViewSet):
 
 class DepartmentViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows departments to be viewed or edited.
+    获取部门
     """
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        """删除部门，发送邮件通知"""
+        from email_notice.services import EmailNotificationService
+        import threading
+        import logging
+
+        logger = logging.getLogger(__name__)
+
+        # 获取要删除的部门信息
+        department = self.get_object()
+        department_data = {
+            'id': department.id,
+            'name': department.name,
+        }
+
+        # 获取用户信息
+        user_info = self._get_user_info(request)
+
+        # 执行删除操作
+        response = super().destroy(request, *args, **kwargs)
+
+        # 异步发送删除通知邮件
+        def send_delete_notification():
+            try:
+                EmailNotificationService.send_operation_notification(
+                    'DELETE', '部门', department_data, user_info
+                )
+            except Exception as e:
+                logger.error(f"发送部门删除通知邮件失败: {e}")
+
+        thread = threading.Thread(target=send_delete_notification)
+        thread.daemon = True
+        thread.start()
+
+        return response
+
+    def _get_user_info(self, request):
+        """获取用户信息"""
+        try:
+            if hasattr(request, 'user') and request.user.is_authenticated:
+                return f"{request.user.username} ({request.user.email})"
+            else:
+                return f"匿名用户 (IP: {self._get_client_ip(request)})"
+        except:
+            return "未知用户"
+
+    def _get_client_ip(self, request):
+        """获取客户端IP"""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows categories to be viewed or edited.
+    获取分类
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer

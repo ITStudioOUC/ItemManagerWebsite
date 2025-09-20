@@ -25,6 +25,7 @@ urlpatterns = [
     path("", include("items.urls")),
     path("", include("finance.urls")),
     path("", include("email_notice.urls")),
+    path("", include("personnel.urls")),
     path("api-auth/", include("rest_framework.urls")),
 ]
 

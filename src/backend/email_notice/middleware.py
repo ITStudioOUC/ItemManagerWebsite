@@ -38,6 +38,12 @@ class EmailNotificationMiddleware(MiddlewareMixin):
                 self._handle_item_operation_async(request, response, user_info)
             elif '/api/records/' in request.path or '/api/finance/' in request.path:
                 self._handle_finance_operation_async(request, response, user_info)
+            elif '/api/personnel/' in request.path:
+                self._handle_personnel_operation_async(request, response, user_info)
+            elif '/api/departments/' in request.path:
+                self._handle_department_operation_async(request, response, user_info)
+            elif '/api/project-groups/' in request.path:
+                self._handle_project_group_operation_async(request, response, user_info)
 
         except Exception as e:
             logger.error(f"邮件通知中间件处理失败: {e}")
@@ -137,7 +143,7 @@ class EmailNotificationMiddleware(MiddlewareMixin):
                     'department': finance_data.get('department', ''),
                     'category': finance_data.get('category', ''),
                     'approver': finance_data.get('approver', ''),
-                    'timestamp': finance_data.get('transaction_date', ''),
+                    'timestamp': finance_data.get('updated_at', ''),
                     'operation_path': request.path,
                     'operation_method': request.method
                 }
@@ -148,6 +154,148 @@ class EmailNotificationMiddleware(MiddlewareMixin):
 
             except Exception as e:
                 logger.error(f"异步处理财务操作通知失败: {e}")
+
+        # 创建并启动后台线程
+        thread = threading.Thread(target=send_notification)
+        thread.daemon = True  # 设置为守护线程
+        thread.start()
+
+    def _handle_personnel_operation_async(self, request, response, user_info):
+        """异步处理人员操作"""
+        def send_notification():
+            try:
+                operation_type = self._get_operation_type(request.method, request.path)
+
+                # 尝试从响应中获取数据
+                if hasattr(response, 'data'):
+                    personnel_data = response.data
+                else:
+                    try:
+                        content = response.content.decode('utf-8')
+                        personnel_data = json.loads(content) if content else {}
+                    except:
+                        personnel_data = {}
+
+                # 确保personnel_data不为None
+                if personnel_data is None:
+                    personnel_data = {}
+
+                # 构建通知数据，使用正确的字段名
+                message = personnel_data['message', '']
+                personnel_data = personnel_data['data', '']
+                notification_data = {
+                    'message': message,
+                    'id': personnel_data.get('id', ''),
+                    'name': personnel_data.get('name', ''),
+                    'student_id': personnel_data.get('student_id', ''),
+                    'gender': personnel_data.get('gender', ''),
+                    'grader_major': personnel_data.get('grade_major', ''),
+                    'department': personnel_data.get('department', ''),
+                    'project_group': personnel_data.get('project_group', ''),
+                    'position': personnel_data.get('position', ''),
+                    'start_date': personnel_data.get('start_date', ''),
+                    'end_date': personnel_data.get('end_date', ''),
+                    'is_active': personnel_data.get('is_active', ''),
+                    'phone': personnel_data.get('phone', ''),
+                    'qq': personnel_data.get('qq', ''),
+                    'email': personnel_data.get('email', ''),
+                    'description': personnel_data.get('description', ''),
+                    'timestamp': personnel_data.get('updated_at', ''),
+                    'operation_path': request.path,
+                    'operation_method': request.method
+                }
+
+                EmailNotificationService.send_operation_notification(
+                    operation_type, '人员', notification_data, user_info
+                )
+
+            except Exception as e:
+                logger.error(f"异步处理人员操作通知失败: {e}")
+
+        # 创建并启动后台线程
+        thread = threading.Thread(target=send_notification)
+        thread.daemon = True  # 设置为守护线程
+        thread.start()
+
+    def _handle_department_operation_async(self, request, response, user_info):
+        """异步处理部门操作"""
+        def send_notification():
+            try:
+                operation_type = self._get_operation_type(request.method, request.path)
+
+                # 尝试从响应中获取数据
+                if hasattr(response, 'data'):
+                    department_data = response.data
+                else:
+                    try:
+                        content = response.content.decode('utf-8')
+                        department_data = json.loads(content) if content else {}
+                    except:
+                        department_data = {}
+
+                # 确保department_data不为None
+                if department_data is None:
+                    department_data = {}
+
+                # 构建通知数据
+                notification_data = {
+                    'id': department_data.get('id', ''),
+                    'name': department_data.get('name', ''),
+                    'timestamp': department_data.get('updated_at', ''),
+                    'operation_path': request.path,
+                    'operation_method': request.method
+                }
+
+                EmailNotificationService.send_operation_notification(
+                    operation_type, '部门', notification_data, user_info
+                )
+
+            except Exception as e:
+                logger.error(f"异步处理部门操作通知失败: {e}")
+
+        # 创建并启动后台线程
+        thread = threading.Thread(target=send_notification)
+        thread.daemon = True  # 设置为守护线程
+        thread.start()
+
+    def _handle_project_group_operation_async(self, request, response, user_info):
+        """异步处理项目组操作"""
+        def send_notification():
+            try:
+                operation_type = self._get_operation_type(request.method, request.path)
+
+                # 尝试从响应中获取数据
+                if hasattr(response, 'data'):
+                    project_group_data = response.data
+                else:
+                    try:
+                        content = response.content.decode('utf-8')
+                        project_group_data = json.loads(content) if content else {}
+                    except:
+                        project_group_data = {}
+
+                # 确保project_group_data不为None
+                if project_group_data is None:
+                    project_group_data = {}
+
+                # 构建通知数据
+                notification_data = {
+                    'id': project_group_data.get('id', ''),
+                    'name': project_group_data.get('name', ''),
+                    'department': project_group_data.get('department', ''),
+                    'department_name': project_group_data.get('department_name', ''),
+                    'description': project_group_data.get('description', ''),
+                    'timestamp': project_group_data.get('updated_at', ''),
+                    'operation_path': request.path,
+                    'operation_method': request.method
+                }
+
+                EmailNotificationService.send_operation_notification(
+                    operation_type, '项目组', notification_data, user_info
+                )
+
+            except Exception as e:
+                logger.error(f"异步处理项目组操作通知失败: {e}")
 
         # 创建并启动后台线程
         thread = threading.Thread(target=send_notification)

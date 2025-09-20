@@ -20,6 +20,14 @@
           <el-icon><Document /></el-icon>
           使用记录
         </el-menu-item>
+        <el-menu-item index="/personnel">
+          <el-icon><User /></el-icon>
+          人员管理
+        </el-menu-item>
+        <el-menu-item index="/department-management">
+          <el-icon><OfficeBuilding /></el-icon>
+          部门管理
+        </el-menu-item>
         <el-menu-item index="/finance">
           <el-icon><Money /></el-icon>
           财务管理
@@ -30,12 +38,8 @@
         </el-menu-item>
       </el-menu>
       <div class="header-actions">
-        <el-button
-          type="text"
-          @click="goToSettings"
-          class="settings-btn"
-        >
-          <el-icon size="20"><Setting /></el-icon>
+        <el-button type="text" class="settings-btn" @click="goToSettings">
+          <el-icon><Setting /></el-icon>
         </el-button>
       </div>
     </div>
@@ -43,7 +47,7 @@
 </template>
 
 <script>
-import { House, Box, Document, Money, Tickets, Setting } from '@element-plus/icons-vue'
+import { House, Box, Document, Money, Tickets, Setting, User, OfficeBuilding } from '@element-plus/icons-vue'
 
 export default {
   name: 'AppHeader',
@@ -53,7 +57,9 @@ export default {
     Document,
     Money,
     Tickets,
-    Setting
+    Setting,
+    User,
+    OfficeBuilding
   },
   methods: {
     goToSettings() {
