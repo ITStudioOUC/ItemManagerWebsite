@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ model_name }}{{ operation_text }}通知</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; color: #333; margin: 0; padding: 0; background: #f5f7fa; }
+    .container { max-width: 720px; margin: 24px auto; background: #ffffff; border: 1px solid #eaecef; border-radius: 8px; overflow: hidden; }
+    .header { background: #409eff; color: #fff; padding: 16px 20px; }
+    .header h1 { font-size: 18px; margin: 0; }
+    .meta { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; background: #fafcff; }
+    .meta-item { margin: 6px 0; font-size: 14px; }
+    .meta-item strong { color: #606266; margin-right: 6px; }
+    .content { padding: 12px 20px 20px; }
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td { text-align: left; padding: 10px 8px; font-size: 14px; }
+    .table tr:nth-child(odd) { background: #fafafa; }
+    .table th { width: 160px; color: #606266; font-weight: 600; background: #f8fafc; border-bottom: 1px solid #f0f0f0; }
+    .footer { padding: 14px 20px; font-size: 12px; color: #909399; background: #fafafb; border-top: 1px solid #f0f0f0; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; color: #fff; }
+    .badge.create { background: #67c23a; }
+    .badge.update { background: #e6a23c; }
+    .badge.delete { background: #f56c6c; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>【{{ model_name }}】<span class="badge {% if operation_text == '创建' %}create{% elif operation_text == '更新' %}update{% elif operation_text == '删除' %}delete{% endif %}">{{ operation_text }}</span> 通知</h1>
+    </div>
+
+    <div class="meta">
+      <div class="meta-item"><strong>数据类型</strong>{{ model_name }}</div>
+      {% if operation_hint %}<div class="meta-item"><strong>操作说明</strong>{{ operation_hint }}</div>{% endif %}
+      <div class="meta-item"><strong>操作时间</strong>{{ timestamp|default:'未知' }}</div>
+      <div class="meta-item"><strong>操作用户</strong>{{ user_info|default:'系统' }}</div>
+    </div>
+
+    {% if data_items and data_items|length %}
+    <div class="content">
+      <table class="table" role="presentation" cellspacing="0" cellpadding="0" border="0">
+        <tbody>
+          {% for it in data_items %}
+          <tr>
+            <th>{{ it.label }}</th>
+            <td>{{ it.value }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    <div class="footer">
+      此邮件由「爱特工作室物品管理及财务管理系统」自动发送，请勿直接回复。
+    </div>
+  </div>
+</body>
+</html>
