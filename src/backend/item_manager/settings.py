@@ -89,12 +89,27 @@ ASGI_APPLICATION = "item_manager.asgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# SQLite 配置
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+# 读取数据库配置
+# DB_SECURE = SECURE.get("DATABASE", {}) if isinstance(SECURE, dict) else {}
+#
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": DB_SECURE.get("NAME"),
+#         "USER": DB_SECURE.get("USER"),
+#         "PASSWORD": DB_SECURE.get("PASSWORD"),
+#         "HOST": DB_SECURE.get("HOST"),
+#         "PORT": DB_SECURE.get("PORT"),
+#     }
+# }
 
 
 # Password validation

@@ -8,6 +8,14 @@
     "EMAIL_USE_SSL": true,
     "DEFAULT_FROM_EMAIL": "",
     "ADMINS": [["", ""]]
+  },
+
+  "DATABASE": {
+    "ENGINE": "填 MariaDB 或 MySQL",
+    "NAME": "数据库名",
+    "USER": "用户",
+    "PASSWORD": "密码",
+    "HOST": "主机ip/域名",
+    "PORT": 3306
   }
 }
-
