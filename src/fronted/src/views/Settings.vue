@@ -3,36 +3,10 @@
     <AppHeader />
     <div class="settings-container">
       <div class="settings-header">
-        <h2>网站设置</h2>
+        <h2>网站设置及说明</h2>
       </div>
 
       <div class="settings-content">
-        <!-- 主题切换 -->
-        <el-card class="setting-card" shadow="never">
-          <template #header>
-            <div class="card-header">
-              <el-icon><Sunny /></el-icon>
-              <span>主题设置</span>
-            </div>
-          </template>
-          <div class="setting-item">
-            <div class="setting-label">
-              <span>网站主题</span>
-              <p class="setting-desc">切换白天/黑夜模式</p>
-            </div>
-            <div class="setting-control">
-              <el-switch
-                v-model="isDarkMode"
-                @change="toggleTheme"
-                active-text="黑夜模式"
-                inactive-text="白天模式"
-                active-color="#409eff"
-                inactive-color="#dcdfe6"
-              />
-            </div>
-          </div>
-        </el-card>
-
         <!-- 邮箱通知设置 -->
         <el-card class="setting-card" shadow="never">
           <template #header>
@@ -90,11 +64,13 @@
                     />
                     <el-button
                       type="danger"
-                      :icon="Delete"
-                      circle
                       size="small"
                       @click="removeExistingEmail(emailItem.id)"
-                    />
+                      class="delete-email-btn"
+                    >
+                      <el-icon><Delete /></el-icon>
+                      删除
+                    </el-button>
                   </div>
                 </div>
               </div>
@@ -197,7 +173,7 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Sunny, Message, InfoFilled, Plus, Delete } from '@element-plus/icons-vue'
+import { Message, InfoFilled, Plus, Delete } from '@element-plus/icons-vue'
 import AppHeader from '@/components/AppHeader.vue'
 import { API_BASE_URL_WITHOUT_API } from '@/services/api'
 
@@ -205,15 +181,12 @@ export default {
   name: 'Settings',
   components: {
     AppHeader,
-    Sunny,
     Message,
     InfoFilled,
     Plus,
     Delete
   },
   setup() {
-    const isDarkMode = ref(false)
-    // notificationEmails 不再需要，因为我们现在使用 allEmails 来管理所有邮箱
     const emailNotificationEnabled = ref(false)
     const allEmails = ref([])
     const newEmail = ref({
@@ -224,11 +197,6 @@ export default {
 
     // 加载设置
     const loadSettings = () => {
-      // 从localStorage加载主题设置
-      const savedTheme = localStorage.getItem('theme')
-      isDarkMode.value = savedTheme === 'dark'
-      applyTheme()
-
       // 从localStorage加载邮件通知设置
       const emailEnabled = localStorage.getItem('emailNotificationEnabled')
       emailNotificationEnabled.value = emailEnabled === 'true'
@@ -267,30 +235,7 @@ export default {
       }
     }
 
-    // 应用主题
-    const applyTheme = () => {
-      const htmlElement = document.documentElement
-      if (isDarkMode.value) {
-        htmlElement.classList.add('dark')
-        htmlElement.style.setProperty('--el-bg-color', '#1a1a1a')
-        htmlElement.style.setProperty('--el-text-color-primary', '#e5e7eb')
-        htmlElement.style.setProperty('--el-text-color-regular', '#d1d5db')
-      } else {
-        htmlElement.classList.remove('dark')
-        htmlElement.style.removeProperty('--el-bg-color')
-        htmlElement.style.removeProperty('--el-text-color-primary')
-        htmlElement.style.removeProperty('--el-text-color-regular')
-      }
-    }
-
-    // 切换主题
-    const toggleTheme = () => {
-      localStorage.setItem('theme', isDarkMode.value ? 'dark' : 'light')
-      applyTheme()
-      ElMessage.success(`已切换到${isDarkMode.value ? '黑夜' : '白天'}模式`)
-    }
-
-    // 保存邮件通知设置 (这个函数现在只用来切换总开关)
+    // 保存邮件通知设置
     const saveEmailNotificationSetting = async () => {
       try {
         localStorage.setItem('emailNotificationEnabled', emailNotificationEnabled.value.toString())
@@ -331,7 +276,7 @@ export default {
       }
     }
 
-    // [已修改] 切换单个邮箱启用状态
+    // 切换单个邮箱启用状态
     const toggleEmailStatus = async (emailId, isEnabled) => {
       try {
         // [关键修改] 请求发送到后端的 toggle_email_status 视图对应的 URL
@@ -368,7 +313,7 @@ export default {
       }
     }
 
-    // [已修改] 添加新邮箱
+    // 添加新邮箱
     const addNewEmail = async () => {
       if (!newEmail.value.email) {
         ElMessage.error('邮箱地址不能为空')
@@ -428,7 +373,7 @@ export default {
       }
     }
 
-    // [已修改] 删除现有邮箱
+    // 删除现有邮箱
     const removeExistingEmail = async (emailId) => {
       try {
         // [关键修改] 构造一个不包含要删除邮箱的新列表
@@ -475,19 +420,13 @@ export default {
     })
 
     return {
-      isDarkMode,
       emailNotificationEnabled,
       allEmails,
       newEmail,
-      toggleTheme,
       saveEmailNotificationSetting,
       toggleEmailStatus,
       removeExistingEmail,
-      addNewEmail,
-      // 删除不再需要的旧方法
-      // saveNotificationEmails,
-      // addEmail,
-      // removeEmail
+      addNewEmail
     }
   }
 }
@@ -698,22 +637,50 @@ export default {
   width: 100%;
 }
 
-/* 暗色主题下的邮箱管理样式 */
-.dark .email-management-section h4 {
-  color: #60a5fa;
+.delete-email-btn {
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  height: 28px !important;
+  border-radius: 4px !important;
+  background-color: #f56c6c !important;
+  border-color: #f56c6c !important;
+  color: #fff !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
 }
 
-.dark .email-management-item {
-  background-color: #2d2d2d;
-  border-color: #434343;
+.delete-email-btn:hover {
+  background-color: #f04747 !important;
+  border-color: #f04747 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(245, 108, 108, 0.3) !important;
 }
 
-.dark .email-address {
-  color: #e5e7eb;
+.delete-email-btn:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 1px 2px rgba(245, 108, 108, 0.2) !important;
 }
 
-.dark .email-description {
-  color: #9ca3af;
+.delete-email-btn .el-icon {
+  font-size: 12px !important;
+}
+
+/* 暗色主题下的删除按钮样式 */
+.dark .delete-email-btn {
+  background-color: #dc2626 !important;
+  border-color: #dc2626 !important;
+}
+
+.dark .delete-email-btn:hover {
+  background-color: #b91c1c !important;
+  border-color: #b91c1c !important;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.4) !important;
+}
+
+.dark .delete-email-btn:active {
+  box-shadow: 0 1px 2px rgba(220, 38, 38, 0.3) !important;
 }
 
 /* 暗色主题 */
