@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "items",
     "finance",
+    "email_notice",
 ]
 
 MIDDLEWARE = [
@@ -57,6 +58,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "email_notice.middleware.EmailNotificationMiddleware",
 ]
 
 ROOT_URLCONF = "item_manager.urls"

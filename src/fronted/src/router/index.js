@@ -7,6 +7,7 @@ import Dashboard from '../views/Dashboard.vue'
 import FinanceDashboard from '../views/FinanceDashboard.vue'
 import FinanceRecordList from '../views/FinanceRecordList.vue'
 import FinanceRecordDetail from '../views/FinanceRecordDetail.vue'
+import Settings from '../views/Settings.vue'
 
 const routes = [
   {
@@ -50,6 +51,11 @@ const routes = [
     name: 'FinanceRecordDetail',
     component: FinanceRecordDetail,
     props: true
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings
   }
 ]
 

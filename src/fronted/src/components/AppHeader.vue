@@ -29,12 +29,21 @@
           财务记录
         </el-menu-item>
       </el-menu>
+      <div class="header-actions">
+        <el-button
+          type="text"
+          @click="goToSettings"
+          class="settings-btn"
+        >
+          <el-icon size="20"><Setting /></el-icon>
+        </el-button>
+      </div>
     </div>
   </el-header>
 </template>
 
 <script>
-import { House, Box, Document, Money, Tickets } from '@element-plus/icons-vue'
+import { House, Box, Document, Money, Tickets, Setting } from '@element-plus/icons-vue'
 
 export default {
   name: 'AppHeader',
@@ -43,7 +52,13 @@ export default {
     Box,
     Document,
     Money,
-    Tickets
+    Tickets,
+    Setting
+  },
+  methods: {
+    goToSettings() {
+      this.$router.push('/settings')
+    }
   }
 }
 </script>
@@ -93,5 +108,21 @@ export default {
   border-bottom: none;
   height: 60px;
   line-height: 60px;
+}
+
+.header-actions {
+  position: absolute;
+  right: 0;
+  z-index: 2;
+}
+
+.settings-btn {
+  color: #606266;
+  font-size: 16px;
+  padding: 10px;
+}
+
+.settings-btn:hover {
+  color: #409eff;
 }
 </style>

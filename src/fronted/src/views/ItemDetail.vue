@@ -141,7 +141,7 @@
 </template>
 
 <script>
-import { itemService } from '../services/api'
+import { itemService } from '@/services/api'
 import { ElMessage } from 'element-plus'
 import AppHeader from '../components/AppHeader.vue'
 import moment from 'moment'
