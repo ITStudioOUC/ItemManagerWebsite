@@ -251,7 +251,7 @@ export default {
             this.$emit('submit');
           } catch (error) {
             console.error('提交失败:', error);
-            this.$message.error('操作失败: ' + (error.response?.data?.detail || '未知错误'));
+            this.$message.error('操作失败: ' + (error.response?.data?.detail || '未知错误，请查看控制台'));
           }
         }
       });
