@@ -480,6 +480,7 @@ export default {
   align-items: center;
   padding: 20px 0;
   border-bottom: 1px solid #f0f2f5;
+  gap: 16px;
 }
 
 .setting-item:last-child {
@@ -600,6 +601,7 @@ export default {
   background-color: #f8f9fa;
   border-radius: 6px;
   border: 1px solid #e9ecef;
+  gap: 12px;
 }
 
 .email-info {
@@ -635,6 +637,7 @@ export default {
   align-items: center;
   gap: 10px;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .delete-email-btn {
@@ -716,5 +719,57 @@ export default {
 .dark .content-section p,
 .dark .content-section li {
   color: #d1d5db;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .settings-container {
+    padding: 12px;
+  }
+  .settings-header h2 {
+    font-size: 20px;
+  }
+  .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 0;
+  }
+  .setting-control {
+    width: 100%;
+  }
+  .email-management-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .email-actions {
+    width: 100%;
+    margin-top: 8px;
+  }
+  .email-actions .el-button {
+    width: auto;
+  }
+  .new-email-form .form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .form-row .el-input {
+    width: 100% !important;
+    margin-right: 0 !important;
+  }
+  .form-row .el-switch {
+    margin-right: 0 !important;
+    margin-bottom: 10px;
+  }
+  .form-row .el-button {
+    width: 100%;
+  }
+  .content-section h3 {
+    font-size: 16px;
+    margin: 16px 0 8px 0;
+  }
+  .content-section p,
+  .content-section li {
+    font-size: 13px;
+  }
 }
 </style>

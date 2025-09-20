@@ -1,7 +1,12 @@
 <template>
   <el-header class="app-header">
     <div class="header-content">
-      <h1 class="logo">爱特工作室物品管理及财务管理系统</h1>
+      <div class="left-wrap">
+        <el-button type="text" class="menu-toggle mobile-only" @click="drawerVisible = true" aria-label="打开导航">
+          <el-icon><Menu /></el-icon>
+        </el-button>
+        <h1 class="logo">爱特工作室物品管理及财务管理系统</h1>
+      </div>
       <el-menu
           mode="horizontal"
           :default-active="$route.path"
@@ -38,16 +43,56 @@
         </el-menu-item>
       </el-menu>
       <div class="header-actions">
-        <el-button type="text" class="settings-btn" @click="goToSettings">
+        <el-button type="text" class="settings-btn" @click="goToSettings" aria-label="设置">
           <el-icon><Setting /></el-icon>
         </el-button>
       </div>
     </div>
+
+    <!-- 移动端抽屉导航 -->
+    <el-drawer v-model="drawerVisible" title="导航" size="80%" :with-header="true">
+      <el-menu
+        mode="vertical"
+        :default-active="$route.path"
+        router
+        class="mobile-menu"
+        @select="drawerVisible = false"
+      >
+        <el-menu-item index="/">
+          <el-icon><House /></el-icon>
+          物品统计
+        </el-menu-item>
+        <el-menu-item index="/items">
+          <el-icon><Box /></el-icon>
+          物品管理
+        </el-menu-item>
+        <el-menu-item index="/usage">
+          <el-icon><Document /></el-icon>
+          使用记录
+        </el-menu-item>
+        <el-menu-item index="/personnel">
+          <el-icon><User /></el-icon>
+          人员管理
+        </el-menu-item>
+        <el-menu-item index="/department-management">
+          <el-icon><OfficeBuilding /></el-icon>
+          部门管理
+        </el-menu-item>
+        <el-menu-item index="/finance">
+          <el-icon><Money /></el-icon>
+          财务管理
+        </el-menu-item>
+        <el-menu-item index="/finance/records">
+          <el-icon><Tickets /></el-icon>
+          财务记录
+        </el-menu-item>
+      </el-menu>
+    </el-drawer>
   </el-header>
 </template>
 
 <script>
-import {Box, Document, House, Money, OfficeBuilding, Setting, Tickets, User} from '@element-plus/icons-vue'
+import {Box, Document, House, Money, OfficeBuilding, Setting, Tickets, User, Menu} from '@element-plus/icons-vue'
 
 export default {
   name: 'AppHeader',
@@ -59,7 +104,13 @@ export default {
     Tickets,
     Setting,
     User,
-    OfficeBuilding
+    OfficeBuilding,
+    Menu
+  },
+  data() {
+    return {
+      drawerVisible: false
+    }
   },
   methods: {
     goToSettings() {
@@ -87,6 +138,19 @@ export default {
   align-items: center;
   width: 100%;
   position: relative;
+}
+
+.left-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu-toggle {
+  display: none;
+  color: #606266;
+  font-size: 18px;
+  padding: 10px;
 }
 
 .logo {
@@ -130,5 +194,34 @@ export default {
 
 .settings-btn:hover {
   color: #409eff;
+}
+
+/* 移动端/平板端样式覆盖，避免标题、菜单与设置按钮堆叠 */
+@media (max-width: 1500px) {
+  .app-header {
+    height: auto !important;
+    padding: 8px 12px;
+  }
+  .header-content {
+    position: static;
+    justify-content: space-between;
+  }
+  .logo {
+    position: static;
+    font-size: 16px;
+    max-width: 60vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .nav-menu {
+    display: none !important;
+  }
+  .menu-toggle {
+    display: inline-flex;
+  }
+  .header-actions {
+    position: static;
+  }
 }
 </style>

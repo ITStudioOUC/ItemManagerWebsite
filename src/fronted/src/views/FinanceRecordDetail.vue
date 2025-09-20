@@ -3,7 +3,7 @@
     <AppHeader />
     <div class="finance-detail-container">
       <div class="detail-header">
-        <el-button @click="$router.go(-1)" style="margin-bottom: 20px;">
+        <el-button @click="$router.go(-1)" class="back-btn">
           <el-icon><ArrowLeft /></el-icon>
           返回
         </el-button>
@@ -20,13 +20,13 @@
 
         <div class="record-details">
           <el-row :gutter="20">
-            <el-col :span="12">
+            <el-col :xs="24" :sm="12">
               <div class="detail-item">
                 <label>标题：</label>
                 <span>{{ record.title }}</span>
               </div>
             </el-col>
-            <el-col :span="12">
+            <el-col :xs="24" :sm="12">
               <div class="detail-item">
                 <label>金额：</label>
                 <span class="amount" :class="record.record_type">
@@ -37,7 +37,7 @@
           </el-row>
 
           <el-row :gutter="20">
-            <el-col :span="12">
+            <el-col :xs="24" :sm="12">
               <div class="detail-item">
                 <label>类型：</label>
                 <el-tag :type="record.record_type === 'income' ? 'success' : 'danger'">
@@ -45,7 +45,7 @@
                 </el-tag>
               </div>
             </el-col>
-            <el-col :span="12">
+            <el-col :xs="24" :sm="12">
               <div class="detail-item">
                 <label>交易日期：</label>
                 <span>{{ record.transaction_date }}</span>
@@ -54,13 +54,13 @@
           </el-row>
 
           <el-row :gutter="20">
-            <el-col :span="12">
+            <el-col :xs="24" :sm="12">
               <div class="detail-item">
                 <label>所属部门：</label>
                 <span>{{ record.department ? record.department.name : '-' }}</span>
               </div>
             </el-col>
-            <el-col :span="12">
+            <el-col :xs="24" :sm="12">
               <div class="detail-item">
                 <label>类别：</label>
                 <span>{{ record.category ? record.category.name : '-' }}</span>
@@ -78,7 +78,7 @@
           </el-row>
 
           <el-row :gutter="20">
-            <el-col :span="12">
+            <el-col :xs="24" :sm="12">
               <div class="detail-item">
                 <label>批准人：</label>
                 <span>{{ record.fund_manager || '-' }}</span>
@@ -143,7 +143,7 @@
 
 <script>
 import {API_BASE_URL_WITHOUT_API, financeService} from '@/services/api';
-import {Delete, Plus} from '@element-plus/icons-vue';
+import {Delete, Plus, ArrowLeft} from '@element-plus/icons-vue';
 import AppHeader from "@/components/AppHeader.vue";
 import FinanceRecordForm from './FinanceRecordForm.vue';
 
@@ -153,7 +153,8 @@ export default {
     AppHeader,
     FinanceRecordForm,
     Plus,
-    Delete
+    Delete,
+    ArrowLeft
   },
   data() {
     return {
@@ -232,6 +233,11 @@ export default {
   color: #666;
 }
 
+.detail-item span,
+.description {
+  word-break: break-word;
+}
+
 .amount.income {
   color: #67c23a;
   font-weight: bold;
@@ -301,5 +307,35 @@ export default {
   max-width: 100%;
   max-height: 70vh;
   object-fit: contain;
+}
+
+.back-btn {
+  /* visually larger target on phones */
+  padding: 10px 14px;
+}
+
+@media (max-width: 768px) {
+  .finance-detail-container {
+    padding: 12px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .images-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .proof-image {
+    height: 180px;
+  }
+
+  .back-btn {
+    width: 100%;
+  }
 }
 </style>

@@ -2,7 +2,7 @@
   <AppHeader />
   <div class="dashboard">
     <el-row :gutter="42">
-      <el-col :span="6">
+      <el-col :xs="12" :sm="12" :md="8" :lg="6" :xl="6">
         <el-card class="stat-card">
           <div class="stat-content">
             <div class="stat-icon available">
@@ -15,7 +15,7 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="6">
+      <el-col :xs="12" :sm="12" :md="8" :lg="6" :xl="6">
         <el-card class="stat-card">
           <div class="stat-content">
             <div class="stat-icon in-use">
@@ -28,7 +28,7 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="6">
+      <el-col :xs="12" :sm="12" :md="8" :lg="6" :xl="6">
         <el-card class="stat-card">
           <div class="stat-content">
             <div class="stat-icon total">
@@ -41,7 +41,7 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="6">
+      <el-col :xs="12" :sm="12" :md="8" :lg="6" :xl="6">
         <el-card class="stat-card">
           <div class="stat-content">
             <div class="stat-icon maintenance">
@@ -54,7 +54,7 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="6">
+      <el-col :xs="12" :sm="12" :md="8" :lg="6" :xl="6">
         <el-card class="stat-card">
           <div class="stat-content">
             <div class="stat-icon damaged">
@@ -67,7 +67,7 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="6">
+      <el-col :xs="12" :sm="12" :md="8" :lg="6" :xl="6">
         <el-card class="stat-card">
           <div class="stat-content">
             <div class="stat-icon lost">
@@ -80,7 +80,7 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="6">
+      <el-col :xs="12" :sm="12" :md="8" :lg="6" :xl="6">
         <el-card class="stat-card">
           <div class="stat-content">
             <div class="stat-icon abandoned">
@@ -93,7 +93,7 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="6">
+      <el-col :xs="12" :sm="12" :md="8" :lg="6" :xl="6">
         <el-card class="stat-card">
           <div class="stat-content">
             <div class="stat-icon prohibited">
@@ -109,48 +109,52 @@
     </el-row>
 
     <el-row :gutter="20" style="margin-top: 20px;">
-      <el-col :span="12">
+      <el-col :xs="24" :sm="24" :md="12">
         <el-card>
           <template #header>
             <span>当前使用中的物品</span>
           </template>
-          <el-table :data="currentUsages" style="width: 100%" max-height="300">
-            <el-table-column prop="item_name" label="物品名称" />
-            <el-table-column prop="user" label="使用者" />
-            <el-table-column prop="start_time" label="开始时间">
-              <template #default="scope">
-                {{ formatDate(scope.row.start_time) }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="purpose" label="使用目的">
-              <template #default="scope">
-                {{ scope.row.purpose || '无' }}
-              </template>
-            </el-table-column>
-          </el-table>
+          <div class="table-wrapper">
+            <el-table :data="currentUsages" style="width: 100%" max-height="300" size="small">
+              <el-table-column prop="item_name" label="物品名称" />
+              <el-table-column prop="user" label="使用者" />
+              <el-table-column prop="start_time" label="开始时间">
+                <template #default="scope">
+                  {{ formatDate(scope.row.start_time) }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="purpose" label="使用目的">
+                <template #default="scope">
+                  {{ scope.row.purpose || '无' }}
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
         </el-card>
       </el-col>
-      <el-col :span="12">
+      <el-col :xs="24" :sm="24" :md="12">
         <el-card>
           <template #header>
             <span>最新添加的物品</span>
           </template>
-          <el-table :data="recentItems" style="width: 100%" max-height="300">
-            <el-table-column prop="name" label="物品名称" />
-            <el-table-column prop="category" label="类别" />
-            <el-table-column prop="status" label="状态">
-              <template #default="scope">
-                <el-tag :type="getStatusType(scope.row.status)">
-                  {{ getStatusText(scope.row.status) }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column prop="created_at" label="添加时间">
-              <template #default="scope">
-                {{ formatDate(scope.row.created_at) }}
-              </template>
-            </el-table-column>
-          </el-table>
+          <div class="table-wrapper">
+            <el-table :data="recentItems" style="width: 100%" max-height="300" size="small">
+              <el-table-column prop="name" label="物品名称" />
+              <el-table-column prop="category" label="类别" />
+              <el-table-column prop="status" label="状态">
+                <template #default="scope">
+                  <el-tag :type="getStatusType(scope.row.status)">
+                    {{ getStatusText(scope.row.status) }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="created_at" label="添加时间">
+                <template #default="scope">
+                  {{ formatDate(scope.row.created_at) }}
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
         </el-card>
       </el-col>
     </el-row>
@@ -271,37 +275,14 @@ export default {
   color: white;
 }
 
-.stat-icon.available {
-  background-color: #67c23a;
-}
-
-.stat-icon.in-use {
-  background-color: #e6a23c;
-}
-
-.stat-icon.total {
-  background-color: #409eff;
-}
-
-.stat-icon.maintenance {
-  background-color: #909399;
-}
-
-.stat-icon.damaged {
-  background-color: #f56c6c;
-}
-
-.stat-icon.lost {
-  background-color: #f59e0b;
-}
-
-.stat-icon.abandoned {
-  background-color: #8e8e8e;
-}
-
-.stat-icon.prohibited {
-  background-color: #409eff;
-}
+.stat-icon.available { background-color: #67c23a; }
+.stat-icon.in-use { background-color: #e6a23c; }
+.stat-icon.total { background-color: #409eff; }
+.stat-icon.maintenance { background-color: #909399; }
+.stat-icon.damaged { background-color: #f56c6c; }
+.stat-icon.lost { background-color: #f59e0b; }
+.stat-icon.abandoned { background-color: #8e8e8e; }
+.stat-icon.prohibited { background-color: #409eff; }
 
 .stat-info h3 {
   margin: 0;
@@ -312,5 +293,28 @@ export default {
 .stat-info p {
   margin: 5px 0 0 0;
   color: #666;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-wrapper .el-table {
+  min-width: 600px; /* allow horizontal scroll on small screens */
+}
+
+@media (max-width: 768px) {
+  .dashboard { padding: 12px; }
+
+  .stat-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+    margin-right: 12px;
+  }
+
+  .stat-info h3 { font-size: 22px; }
+  .stat-info p { font-size: 12px; }
 }
 </style>

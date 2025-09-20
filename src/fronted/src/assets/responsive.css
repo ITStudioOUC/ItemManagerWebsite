@@ -1,0 +1,52 @@
+/* 手机UI适配 */
+html, body, #app {
+  height: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Utility visibility helpers */
+.mobile-hidden { display: block; }
+.mobile-only { display: none; }
+
+@media (max-width: 768px) {
+  body {
+    -webkit-tap-highlight-color: transparent;
+    font-size: 14px;
+  }
+
+  .mobile-hidden { display: none !important; }
+  .mobile-only { display: block !important; }
+
+  /* Element Plus common components */
+  .el-card__body {
+    padding: 12px;
+  }
+
+  .el-dialog {
+    width: 96% !important;
+    margin: 6vh auto !important;
+  }
+
+  .el-button, .el-input__inner, .el-select, .el-textarea__inner {
+    font-size: 14px;
+  }
+
+  .el-form-item {
+    margin-bottom: 12px;
+  }
+
+  .el-message-box {
+    width: 90% !important;
+  }
+}
+
+/* ipad适配 */
+@media (max-width: 1500px) {
+  .mobile-hidden { display: none !important; }
+  .mobile-only { display: block !important; }
+}
