@@ -12,13 +12,63 @@
       <template #header>
         <div class="card-header">
           <span>物品详情</span>
-          <el-button type="primary" @click="editMode = !editMode">
-            {{ editMode ? '取消编辑' : '编辑' }}
-          </el-button>
+          <div>
+            <el-button @click="showImageUpload = true" style="margin-right: 10px;">
+              <el-icon><Picture /></el-icon>
+              上传图片
+            </el-button>
+            <el-button type="primary" @click="editMode = !editMode">
+              {{ editMode ? '取消编辑' : '编辑' }}
+            </el-button>
+          </div>
         </div>
       </template>
 
       <div v-if="item">
+        <!-- 物品图片展示 -->
+        <el-card class="image-section" style="margin-bottom: 20px;">
+          <template #header>
+            <span>物品图片</span>
+          </template>
+          <div v-if="item.images && item.images.length > 0" class="image-gallery">
+            <div v-for="image in item.images" :key="image.id" class="image-item">
+              <div class="image-container">
+                <el-image
+                  :src="image.image_url"
+                  :preview-src-list="imagePreviewList"
+                  fit="cover"
+                  class="item-image"
+                />
+                <!-- 图片操作按钮 -->
+                <div class="image-actions">
+                  <el-button
+                    v-if="!image.is_primary"
+                    size="small"
+                    type="primary"
+                    @click="setPrimaryImage(image.id)"
+                    class="action-btn"
+                  >
+                    设为主图
+                  </el-button>
+                  <el-button
+                    size="small"
+                    type="danger"
+                    @click="deleteImage(image.id)"
+                    class="action-btn"
+                  >
+                    <el-icon><Delete /></el-icon>
+                  </el-button>
+                </div>
+              </div>
+              <div class="image-info">
+                <el-tag v-if="image.is_primary" type="success" size="small">主图</el-tag>
+                <p v-if="image.description" class="image-desc">{{ image.description }}</p>
+              </div>
+            </div>
+          </div>
+          <el-empty v-else description="暂无图片" />
+        </el-card>
+
         <el-form :model="editableItem" label-width="120px" :disabled="!editMode">
           <el-row :gutter="20">
             <el-col :span="12">
@@ -103,6 +153,18 @@
               </template>
             </el-table-column>
             <el-table-column prop="purpose" label="使用目的" />
+            <el-table-column label="图片" width="100">
+              <template #default="scope">
+                <el-button
+                  v-if="scope.row.borrow_images?.length > 0 || scope.row.return_images?.length > 0"
+                  size="small"
+                  @click="showUsageImages(scope.row)"
+                >
+                  <el-icon><Picture /></el-icon>
+                </el-button>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="is_returned" label="状态">
               <template #default="scope">
                 <el-tag :type="scope.row.is_returned ? 'success' : 'warning'">
@@ -120,8 +182,37 @@
       </div>
     </el-card>
 
+    <!-- 物品图片上传对话框 -->
+    <el-dialog v-model="showImageUpload" title="上传物品图片" width="500px">
+      <el-upload
+        ref="uploadRef"
+        :auto-upload="false"
+        :multiple="true"
+        :limit="10"
+        accept="image/*"
+        list-type="picture-card"
+        :on-change="handleImageChange"
+        :on-remove="handleImageRemove"
+      >
+        <el-icon><Plus /></el-icon>
+      </el-upload>
+      <div style="margin-top: 10px;">
+        <el-text type="info" size="small">
+          支持 JPG、PNG 格式，最多上传 10 张图片
+        </el-text>
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="showImageUpload = false">取消</el-button>
+          <el-button type="primary" @click="uploadImages" :loading="uploading">
+            上传
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
     <!-- 使用记录详情对话框 -->
-    <el-dialog v-model="showUsageDialog" title="使用记录详情" width="600px">
+    <el-dialog v-model="showUsageDialog" title="使用记录详情" width="800px">
       <div v-if="selectedUsage">
         <el-descriptions :column="2" border>
           <el-descriptions-item label="使用者">{{ selectedUsage.user }}</el-descriptions-item>
@@ -132,9 +223,47 @@
           </el-descriptions-item>
           <el-descriptions-item label="使用前状况">{{ selectedUsage.condition_before || '无' }}</el-descriptions-item>
           <el-descriptions-item label="使用后状况">{{ selectedUsage.condition_after || '无' }}</el-descriptions-item>
-          <el-descriptions-item label="使用目的">{{ selectedUsage.notes || '无' }}</el-descriptions-item>
+          <el-descriptions-item label="使用目的">{{ selectedUsage.purpose || '无' }}</el-descriptions-item>
           <el-descriptions-item label="备注" :span="2">{{ selectedUsage.notes || '无' }}</el-descriptions-item>
         </el-descriptions>
+      </div>
+    </el-dialog>
+
+    <!-- 使用记录图片对话框 -->
+    <el-dialog v-model="showUsageImagesDialog" title="使用记录图片" width="800px">
+      <div v-if="selectedUsageImages">
+        <div v-if="selectedUsageImages.borrow_images?.length > 0" class="usage-images-section">
+          <h4>借用时图片</h4>
+          <div class="image-gallery">
+            <el-image
+              v-for="image in selectedUsageImages.borrow_images"
+              :key="image.id"
+              :src="image.image_url"
+              :preview-src-list="borrowImagePreviewList"
+              fit="cover"
+              class="usage-image"
+            />
+          </div>
+        </div>
+
+        <div v-if="selectedUsageImages.return_images?.length > 0" class="usage-images-section">
+          <h4>归还时图片</h4>
+          <div class="image-gallery">
+            <el-image
+              v-for="image in selectedUsageImages.return_images"
+              :key="image.id"
+              :src="image.image_url"
+              :preview-src-list="returnImagePreviewList"
+              fit="cover"
+              class="usage-image"
+            />
+          </div>
+        </div>
+
+        <div v-if="(!selectedUsageImages.borrow_images || selectedUsageImages.borrow_images.length === 0) &&
+                   (!selectedUsageImages.return_images || selectedUsageImages.return_images.length === 0)">
+          <el-empty description="暂无图片" />
+        </div>
       </div>
     </el-dialog>
   </div>
@@ -144,12 +273,17 @@
 import {itemService} from '@/services/api'
 import {ElMessage} from 'element-plus'
 import AppHeader from '../components/AppHeader.vue'
+import { Picture, Plus, ArrowLeft, Delete } from '@element-plus/icons-vue'
 import moment from 'moment'
 
 export default {
   name: 'ItemDetail',
   components: {
-    AppHeader
+    AppHeader,
+    Picture,
+    Plus,
+    ArrowLeft,
+    Delete
   },
   props: {
     id: {
@@ -164,7 +298,23 @@ export default {
       loading: false,
       editMode: false,
       showUsageDialog: false,
-      selectedUsage: null
+      selectedUsage: null,
+      showImageUpload: false,
+      uploading: false,
+      uploadFiles: [],
+      showUsageImagesDialog: false,
+      selectedUsageImages: null
+    }
+  },
+  computed: {
+    imagePreviewList() {
+      return this.item?.images?.map(img => img.image_url) || []
+    },
+    borrowImagePreviewList() {
+      return this.selectedUsageImages?.borrow_images?.map(img => img.image_url) || []
+    },
+    returnImagePreviewList() {
+      return this.selectedUsageImages?.return_images?.map(img => img.image_url) || []
     }
   },
   async mounted() {
@@ -199,6 +349,73 @@ export default {
       this.selectedUsage = usage
       this.showUsageDialog = true
     },
+    showUsageImages(usage) {
+      this.selectedUsageImages = usage
+      this.showUsageImagesDialog = true
+    },
+    handleImageChange(file, fileList) {
+      this.uploadFiles = fileList
+    },
+    handleImageRemove(file, fileList) {
+      this.uploadFiles = fileList
+    },
+    async uploadImages() {
+      if (this.uploadFiles.length === 0) {
+        ElMessage.warning('请选择要上传的图片')
+        return
+      }
+
+      this.uploading = true
+      try {
+        const formData = new FormData()
+        this.uploadFiles.forEach((file, index) => {
+          formData.append('images', file.raw)
+          formData.append(`image_descriptions[${index}]`, '')
+        })
+
+        await itemService.uploadItemImages(this.id, formData)
+        ElMessage.success('图片上传成功')
+        this.showImageUpload = false
+        this.uploadFiles = []
+        this.$refs.uploadRef.clearFiles()
+        await this.loadItem()
+      } catch (error) {
+        console.error('图片上传失败:', error)
+        ElMessage.error('图片上传失败')
+      } finally {
+        this.uploading = false
+      }
+    },
+    async setPrimaryImage(imageId) {
+      try {
+        await itemService.setPrimaryImage(this.id, imageId)
+        ElMessage.success('主图设置成功')
+        await this.loadItem()
+      } catch (error) {
+        console.error('设置主图失败:', error)
+        ElMessage.error('设置主图失败')
+      }
+    },
+    async deleteImage(imageId) {
+      this.$confirm('确定删除这张图片吗？', '确认删除', {
+        confirmButtonText: '删除',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          try {
+            await itemService.deleteItemImage(this.id, imageId)
+            ElMessage.success('图片删除成功')
+            await this.loadItem()
+          } catch (error) {
+            console.error('删除图片失败:', error)
+            ElMessage.error('删除图片失败')
+          }
+        })
+        .catch(() => {
+          // 取消删除
+        })
+    },
     formatDate(dateString) {
       return moment(dateString).format('YYYY-MM-DD HH:mm:ss')
     }
@@ -215,5 +432,71 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.image-section {
+  margin-bottom: 20px;
+}
+
+.image-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  padding: 10px 0;
+}
+
+.image-item {
+  text-align: center;
+}
+
+.item-image {
+  width: 200px;
+  height: 150px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.usage-image {
+  width: 150px;
+  height: 120px;
+  border-radius: 8px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.image-info {
+  margin-top: 8px;
+}
+
+.image-desc {
+  font-size: 12px;
+  color: #666;
+  margin: 4px 0 0 0;
+}
+
+.usage-images-section {
+  margin-bottom: 20px;
+}
+
+.usage-images-section h4 {
+  margin-bottom: 10px;
+  color: #409eff;
+}
+
+.image-container {
+  position: relative;
+}
+
+.image-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 5px;
+}
+
+.action-btn {
+  padding: 0 5px;
+  font-size: 12px;
 }
 </style>

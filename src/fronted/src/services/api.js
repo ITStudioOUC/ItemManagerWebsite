@@ -113,9 +113,13 @@ export const itemService = {
     return apiClient.get(`/items/${id}/`)
   },
 
-  // 创建新物品
-  createItem(item) {
-    return apiClient.post('/items/', item)
+  // 创建新物品（支持图片上传）
+  createItem(formData) {
+    return apiClient.post('/items/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
   },
 
   // 更新物品
@@ -128,6 +132,31 @@ export const itemService = {
     return apiClient.delete(`/items/${id}/`)
   },
 
+  // 上传物品图片
+  uploadItemImages(itemId, formData) {
+    return apiClient.post(`/items/${itemId}/upload_images/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+
+  // 设置主图片
+  setPrimaryImage(itemId, imageId) {
+    const formData = new FormData()
+    formData.append('image_id', imageId)
+    return apiClient.post(`/items/${itemId}/set_primary_image/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+
+  // 删除物品图片
+  deleteItemImage(itemId, imageId) {
+    return apiClient.delete(`/item-images/${imageId}/`)
+  },
+
   // 获取可用物品
   getAvailableItems() {
     return apiClient.get('/items/available/')
@@ -138,14 +167,22 @@ export const itemService = {
     return apiClient.get('/items/in_use/')
   },
 
-  // 借用物品
-  borrowItem(itemId, borrowData) {
-    return apiClient.post(`/items/${itemId}/borrow/`, borrowData)
+  // 借用物品（支持图片上传）
+  borrowItem(itemId, formData) {
+    return apiClient.post(`/items/${itemId}/borrow/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
   },
 
-  // 归还物品
-  returnItem(itemId, returnData) {
-    return apiClient.post(`/items/${itemId}/return_item/`, returnData)
+  // 归还物品（支持图片上传）
+  returnItem(itemId, formData) {
+    return apiClient.post(`/items/${itemId}/return_item/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
   }
 }
 
@@ -173,6 +210,15 @@ export const usageService = {
   // 更新使用记录
   updateUsage(id, usage) {
     return apiClient.put(`/usages/${id}/`, usage)
+  },
+
+  // 上传使用记录图片
+  uploadUsageImages(usageId, formData) {
+    return apiClient.post(`/usages/${usageId}/upload_images/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
   }
 }
 

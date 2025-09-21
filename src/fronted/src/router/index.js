@@ -2,6 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import Login from '../views/Login.vue'
 import ItemList from '../views/ItemList.vue'
 import ItemDetail from '../views/ItemDetail.vue'
+import ItemCreate from '../views/ItemCreate.vue'
 import ItemUsage from '../views/ItemUsage.vue'
 import Dashboard from '../views/Dashboard.vue'
 import FinanceDashboard from '../views/FinanceDashboard.vue'
@@ -27,6 +28,11 @@ const routes = [
     path: '/items',
     name: 'ItemList',
     component: ItemList
+  },
+  {
+    path: '/items/create',
+    name: 'ItemCreate',
+    component: ItemCreate
   },
   {
     path: '/items/:id',
