@@ -58,3 +58,4 @@ apt install python3.x-venv # 其实就是安装 venv 包，x 是你的 python3 �
 
 - 如果需要使用 MySQL/MariaDB 作为数据库，请在 `src/backend/item_manager/settings.py` 中修改数据库配置，并且填写 `secure.json` 中的数据库信息
 - 如果需要自定义登录背景图，请修改源代码，`src/frontend/src/views/Login.vue` 中的 `backgroundImage` 字段，并将背景图放到 `src/frontend/public/_images/` 目录下
+- 如果出现 MYSQL 软件包安装问题，尝试输入以下指令 ` apt-get install python3-dev default-libmysqlclient-dev build-essential pkg-config`
