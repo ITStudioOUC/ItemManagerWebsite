@@ -312,10 +312,11 @@ class EmailNotificationMiddleware(MiddlewareMixin):
                 notification_data = {
                     'id': project_group_data.get('id', ''),
                     'name': project_group_data.get('name', ''),
-                    'department': project_group_data.get('department', ''),
-                    'department_name': project_group_data.get('department_name', ''),
+                    'departments': project_group_data.get('departments', ''),
+                    'department_names': project_group_data.get('department_names', ''),
+                    'departments_info': project_group_data.get('departments_info', ''),
                     'description': project_group_data.get('description', ''),
-                    'timestamp': project_group_data.get('updated_at', ''),
+                    'timestamp': project_group_data.get('created_at', ''),
                     'operation_path': request.path,
                     'operation_method': request.method
                 }

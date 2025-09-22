@@ -66,6 +66,7 @@ LABEL_MAP = {
     'grade_major': '年级专业',
     'project_group': '项目组',
     'project_group_name': '项目组',
+    'department_names': '所属部门',
     'position': '职位',
     'start_date': '开始日期',
     'end_date': '结束日期',
@@ -91,7 +92,15 @@ def _format_value(value):
         return str(value)
     if isinstance(value, bool):
         return '是' if value else '否'
-    if isinstance(value, (list, dict)):
+    if isinstance(value, list):
+        # 对于列表，优先显示为逗号分隔的字符串
+        if all(isinstance(item, str) for item in value):
+            return ', '.join(value)
+        try:
+            return json.dumps(value, ensure_ascii=False)
+        except Exception:
+            return str(value)
+    if isinstance(value, dict):
         try:
             return json.dumps(value, ensure_ascii=False)
         except Exception:

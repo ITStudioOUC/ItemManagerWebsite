@@ -6,12 +6,17 @@ from .models import Personnel, ProjectGroup
 
 class ProjectGroupSerializer(serializers.ModelSerializer):
     """项目组序列化器"""
-    department_name = serializers.CharField(source='department.name', read_only=True)
+    department_names = serializers.ListField(read_only=True)
+    departments_info = serializers.SerializerMethodField()
 
     class Meta:
         model = ProjectGroup
-        fields = ['id', 'name', 'department', 'department_name', 'description', 'created_at']
+        fields = ['id', 'name', 'departments', 'department_names', 'departments_info', 'description', 'created_at']
         read_only_fields = ['created_at']
+
+    def get_departments_info(self, obj):
+        """获取部门详细信息"""
+        return [{'id': dept.id, 'name': dept.name} for dept in obj.departments.all()]
 
 
 class PersonnelReadSerializer(serializers.ModelSerializer):
@@ -45,11 +50,13 @@ class PersonnelWriteSerializer(serializers.ModelSerializer):
         ]
 
     def validate_project_group(self, value):
-        """验证项目组是否属于选定的部门"""
+        """验证项目组是否包含选定的部门"""
         if value and hasattr(self, 'initial_data'):
             department_id = self.initial_data.get('department')
-            if department_id and value.department_id != int(department_id):
-                raise serializers.ValidationError("项目组必须属于选定的部门")
+            if department_id:
+                # 检查项目组的部门列表中是否包含选定的部门
+                if not value.departments.filter(id=int(department_id)).exists():
+                    raise serializers.ValidationError("项目组必须包含选定的部门")
         return value
 
     def validate(self, attrs):

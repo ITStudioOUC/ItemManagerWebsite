@@ -209,7 +209,9 @@ export default {
         return []
       }
       const departmentId = parseInt(this.form.department)
-      return this.projectGroups.filter(group => group.department === departmentId)
+      return this.projectGroups.filter(group =>
+        group.departments && group.departments.includes(departmentId)
+      )
     }
   },
   watch: {

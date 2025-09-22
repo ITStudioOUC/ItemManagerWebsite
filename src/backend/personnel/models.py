@@ -6,17 +6,23 @@ from finance.models import Department
 class ProjectGroup(models.Model):
     """项目组模型"""
     name = models.CharField(max_length=100, verbose_name="项目组名称")
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name="所属部门")
+    departments = models.ManyToManyField(Department, verbose_name="所属部门", related_name="project_groups")
     description = models.TextField(blank=True, null=True, verbose_name="项目组描述")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
 
     class Meta:
         verbose_name = "项目组"
         verbose_name_plural = verbose_name
-        ordering = ['department', 'name']
+        ordering = ['name']
 
     def __str__(self):
-        return f"{self.department.name} - {self.name}"
+        department_names = ", ".join([dept.name for dept in self.departments.all()])
+        return f"{self.name} ({department_names})" if department_names else self.name
+
+    @property
+    def department_names(self):
+        """返回所属部门名称列表"""
+        return [dept.name for dept in self.departments.all()]
 
 
 class Personnel(models.Model):

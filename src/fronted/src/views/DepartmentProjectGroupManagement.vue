@@ -54,7 +54,13 @@
 
             <el-table :data="filteredProjectGroups" style="width: 100%" v-loading="projectGroupLoading">
               <el-table-column prop="name" label="项目组名称" />
-              <el-table-column prop="department_name" label="所属部门" />
+              <el-table-column label="所属部门" min-width="150">
+                <template #default="scope">
+                  <el-tag v-for="dept in scope.row.departments_info" :key="dept.id" size="small" style="margin-right: 5px;">
+                    {{ dept.name }}
+                  </el-tag>
+                </template>
+              </el-table-column>
               <el-table-column prop="description" label="描述" show-overflow-tooltip />
               <el-table-column label="操作" width="150">
                 <template #default="scope">
@@ -86,8 +92,8 @@
           <el-form-item label="项目组名称" prop="name">
             <el-input v-model="projectGroupForm.name" placeholder="请输入项目组名称" />
           </el-form-item>
-          <el-form-item label="所属部门" prop="department">
-            <el-select v-model="projectGroupForm.department" placeholder="请选择所属部门">
+          <el-form-item label="所属部门" prop="departments">
+            <el-select v-model="projectGroupForm.departments" placeholder="请选择所属部门" multiple>
               <el-option
                 v-for="dept in departments"
                 :key="dept.id"
@@ -152,14 +158,14 @@ export default {
       projectGroupForm: {
         id: null,
         name: '',
-        department: '',
+        departments: [],
         description: ''
       },
       projectGroupRules: {
         name: [
           { required: true, message: '请输入项目组名称', trigger: 'blur' }
         ],
-        department: [
+        departments: [
           { required: true, message: '请选择所属部门', trigger: 'change' }
         ]
       }
@@ -170,7 +176,9 @@ export default {
       if (!this.departmentFilter) {
         return this.projectGroups
       }
-      return this.projectGroups.filter(group => group.department === parseInt(this.departmentFilter))
+      return this.projectGroups.filter(group =>
+        group.departments && group.departments.includes(parseInt(this.departmentFilter))
+      )
     }
   },
   async created() {
@@ -270,13 +278,16 @@ export default {
 
     // 项目组管理方法
     showAddProjectGroupDialog() {
-      this.projectGroupForm = { id: null, name: '', department: '', description: '' }
+      this.projectGroupForm = { id: null, name: '', departments: [], description: '' }
       this.projectGroupDialogTitle = '添加项目组'
       this.projectGroupDialogVisible = true
     },
 
     editProjectGroup(projectGroup) {
-      this.projectGroupForm = { ...projectGroup }
+      this.projectGroupForm = {
+        ...projectGroup,
+        departments: projectGroup.departments || []
+      }
       this.projectGroupDialogTitle = '编辑项目组'
       this.projectGroupDialogVisible = true
     },

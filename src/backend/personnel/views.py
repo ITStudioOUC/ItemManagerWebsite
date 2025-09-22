@@ -197,16 +197,16 @@ class ProjectGroupViewSet(viewsets.ModelViewSet):
     queryset = ProjectGroup.objects.all()
     serializer_class = ProjectGroupSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['department']
+    filterset_fields = ['departments']
     search_fields = ['name', 'description']
-    ordering = ['department', 'name']
+    ordering = ['name']
 
     @action(detail=False, methods=['get'])
     def by_department(self, request):
         """按部门获取项目组"""
         department_id = request.query_params.get('department_id')
         if department_id:
-            project_groups = ProjectGroup.objects.filter(department_id=department_id)
+            project_groups = ProjectGroup.objects.filter(departments__id=department_id).distinct()
             serializer = self.get_serializer(project_groups, many=True)
             return Response(serializer.data)
         return Response([])
@@ -221,7 +221,7 @@ class ProjectGroupViewSet(viewsets.ModelViewSet):
         project_group_data = {
             'id': project_group.id,
             'name': "[已删除]" + project_group.name,
-            'department_name': project_group.department.name if project_group.department else '',
+            'department_names': project_group.department_names,
             'description': project_group.description,
             'created_at': str(project_group.created_at),
             'operation_path': request.path,
@@ -267,13 +267,3 @@ class ProjectGroupViewSet(viewsets.ModelViewSet):
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
-
-    @action(detail=False, methods=['get'])
-    def by_department(self, request):
-        """按部门获取项目组"""
-        department_id = request.query_params.get('department_id')
-        if department_id:
-            project_groups = ProjectGroup.objects.filter(department_id=department_id)
-            serializer = self.get_serializer(project_groups, many=True)
-            return Response(serializer.data)
-        return Response([])
