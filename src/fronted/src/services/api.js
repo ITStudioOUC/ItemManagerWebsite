@@ -428,3 +428,52 @@ export const projectGroupService = {
         })
     }
 }
+
+// 备忘录管理服务
+export const memoService = {
+    // 获取所有备忘录
+    getMemos(search = '') {
+        const params = search ? { search } : {}
+        return apiClient.get('/memos/', { params })
+    },
+
+    // 获取备忘录详情
+    getMemo(id) {
+        return apiClient.get(`/memos/${id}/`)
+    },
+
+    // 创建新备忘录
+    createMemo(memo) {
+        return apiClient.post('/memos/', memo)
+    },
+
+    // 更新备忘录
+    updateMemo(id, memo) {
+        return apiClient.put(`/memos/${id}/`, memo)
+    },
+
+    // 删除备忘录
+    deleteMemo(id) {
+        return apiClient.delete(`/memos/${id}/`)
+    },
+
+    // 上传图片到备忘录
+    uploadImage(memoId, file, altText = '') {
+        const formData = new FormData()
+        formData.append('image', file)
+        formData.append('alt_text', altText)
+
+        return apiClient.post(`/memos/${memoId}/upload_image/`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+    },
+
+    // 删除备忘录中的图片
+    deleteImage(memoId, imageId) {
+        return apiClient.delete(`/memos/${memoId}/delete_image/`, {
+            data: { image_id: imageId }
+        })
+    }
+}

@@ -11,6 +11,7 @@ import FinanceRecordDetail from '../views/FinanceRecordDetail.vue'
 import PersonnelList from '../views/PersonnelList.vue'
 import DepartmentProjectGroupManagement from '../views/DepartmentProjectGroupManagement.vue'
 import Settings from '../views/Settings.vue'
+import Memo from '../views/Memo.vue'
 import { authService } from '@/services/api'
 
 const routes = [
@@ -75,6 +76,11 @@ const routes = [
     path: '/settings',
     name: 'Settings',
     component: Settings
+  },
+  {
+    path: '/memo',
+    name: 'Memo',
+    component: Memo
   }
 ]
 

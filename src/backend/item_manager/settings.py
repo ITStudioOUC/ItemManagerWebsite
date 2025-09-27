@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "email_notice",
     "personnel",
     "scheduler",
+    "memo",
 ]
 
 MIDDLEWARE = [

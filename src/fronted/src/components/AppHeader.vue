@@ -41,6 +41,10 @@
           <el-icon><Tickets /></el-icon>
           财务记录
         </el-menu-item>
+        <el-menu-item index="/memo">
+          <el-icon><EditPen /></el-icon>
+          备忘录
+        </el-menu-item>
       </el-menu>
       <div class="header-actions">
         <el-button type="text" class="settings-btn" @click="goToSettings" aria-label="设置">
@@ -86,13 +90,17 @@
           <el-icon><Tickets /></el-icon>
           财务记录
         </el-menu-item>
+        <el-menu-item index="/memo">
+          <el-icon><EditPen /></el-icon>
+          备忘录
+        </el-menu-item>
       </el-menu>
     </el-drawer>
   </el-header>
 </template>
 
 <script>
-import {Box, Document, House, Money, OfficeBuilding, Setting, Tickets, User, Menu} from '@element-plus/icons-vue'
+import {Box, Document, House, Money, OfficeBuilding, Setting, Tickets, User, Menu, EditPen} from '@element-plus/icons-vue'
 
 export default {
   name: 'AppHeader',
@@ -105,7 +113,8 @@ export default {
     Setting,
     User,
     OfficeBuilding,
-    Menu
+    Menu,
+    EditPen
   },
   data() {
     return {
