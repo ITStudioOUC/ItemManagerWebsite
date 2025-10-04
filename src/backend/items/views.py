@@ -4,7 +4,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from .models import Item, ItemUsage, Category, ItemImage, UsageImage
 from .serializers import (
@@ -16,7 +16,7 @@ from .serializers import (
 class ItemViewSet(viewsets.ModelViewSet):
     """物品管理API"""
     authentication_classes = [JWTAuthentication]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
 
@@ -208,7 +208,7 @@ class ItemViewSet(viewsets.ModelViewSet):
 class ItemUsageViewSet(viewsets.ModelViewSet):
     """使用记录管理API"""
     authentication_classes = [JWTAuthentication]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     queryset = ItemUsage.objects.all()
     serializer_class = ItemUsageSerializer
 
@@ -273,7 +273,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 class ItemImageViewSet(viewsets.ModelViewSet):
     """物品图片管理API"""
     authentication_classes = [JWTAuthentication]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     queryset = ItemImage.objects.all()
     serializer_class = ItemImageSerializer
 
@@ -281,6 +281,6 @@ class ItemImageViewSet(viewsets.ModelViewSet):
 class UsageImageViewSet(viewsets.ModelViewSet):
     """使用记录图片管理API"""
     authentication_classes = [JWTAuthentication]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     queryset = UsageImage.objects.all()
     serializer_class = UsageImageSerializer
