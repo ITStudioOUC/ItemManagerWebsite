@@ -154,15 +154,15 @@
             <p>如有问题或建议，请联系系统管理员：</p>
             <ul>
               <li>邮箱：admin@itstudio.com</li>
-              <li>QQ群：123456789</li>
               <li>技术支持：Web部、站长</li>
             </ul>
 
             <h3>版本信息</h3>
             <p>
               当前版本：v1.0.0<br>
-              更新时间：2024年9月<br>
+              更新时间：2025年9月<br>
               开发团队：爱特工作室
+              GitHub：https://github.com/ITStudioOUC/ItemManagerWebsite
             </p>
           </div>
         </el-card>
