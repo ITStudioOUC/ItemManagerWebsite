@@ -161,7 +161,7 @@
             <p>
               当前版本：v1.0.0<br>
               更新时间：2025年9月<br>
-              开发团队：爱特工作室
+              开发团队：爱特工作室<br>
               GitHub：https://github.com/ITStudioOUC/ItemManagerWebsite
             </p>
           </div>
