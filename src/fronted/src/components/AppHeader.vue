@@ -33,6 +33,10 @@
           <el-icon><OfficeBuilding /></el-icon>
           部门管理
         </el-menu-item>
+        <el-menu-item index="/evaluations">
+          <el-icon><Trophy /></el-icon>
+          考评记录
+        </el-menu-item>
         <el-menu-item index="/finance">
           <el-icon><Money /></el-icon>
           财务管理
@@ -82,6 +86,10 @@
           <el-icon><OfficeBuilding /></el-icon>
           部门管理
         </el-menu-item>
+        <el-menu-item index="/evaluations">
+          <el-icon><Trophy /></el-icon>
+          考评记录
+        </el-menu-item>
         <el-menu-item index="/finance">
           <el-icon><Money /></el-icon>
           财务管理
@@ -100,7 +108,7 @@
 </template>
 
 <script>
-import {Box, Document, House, Money, OfficeBuilding, Setting, Tickets, User, Menu, EditPen} from '@element-plus/icons-vue'
+import {Box, Document, House, Money, OfficeBuilding, Setting, Tickets, User, Menu, EditPen, Trophy} from '@element-plus/icons-vue'
 
 export default {
   name: 'AppHeader',
@@ -114,7 +122,8 @@ export default {
     User,
     OfficeBuilding,
     Menu,
-    EditPen
+    EditPen,
+    Trophy
   },
   data() {
     return {
