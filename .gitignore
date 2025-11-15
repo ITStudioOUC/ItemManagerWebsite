@@ -1,0 +1,62 @@
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# IDE / editor folders
+.idea/
+.vscode/
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+.Python
+build/
+dist/
+
+# Django / local data
+*.sqlite3
+media/
+staticfiles/
+*.log
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# Virtual environments
+env/
+venv/
+.venv/
+src/backend/venv/
+
+# Environment / secret files
+*.env
+.env.*
+src/backend/item_manager/secure.json
+
+# Node / frontend artifacts
+node_modules/
+src/fronted/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+dist/
+src/fronted/dist/
+
+# Coverage / test reports
+.coverage
+coverage.xml
+htmlcov/
+
+# Local tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.sass-cache/
+
+.gitignore

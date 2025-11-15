@@ -12,6 +12,7 @@ import PersonnelList from '../views/PersonnelList.vue'
 import DepartmentProjectGroupManagement from '../views/DepartmentProjectGroupManagement.vue'
 import Settings from '../views/Settings.vue'
 import Memo from '../views/Memo.vue'
+import EvaluationRecordList from '../views/EvaluationRecordList.vue'
 import { authService } from '@/services/api'
 
 const routes = [
@@ -81,6 +82,11 @@ const routes = [
     path: '/memo',
     name: 'Memo',
     component: Memo
+  },
+  {
+    path: '/evaluations',
+    name: 'EvaluationRecordList',
+    component: EvaluationRecordList
   }
 ]
 

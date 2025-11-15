@@ -429,6 +429,48 @@ export const projectGroupService = {
     }
 }
 
+// 考评记录服务
+export const evaluationService = {
+    // 获取考评记录列表
+    getEvaluationRecords(params = {}) {
+        return apiClient.get('/evaluation-records/', { params })
+    },
+
+    // 导出考评记录总表
+    exportEvaluationRecords(params = {}) {
+        return apiClient.get('/evaluation-records/export/', {
+            params,
+            responseType: 'arraybuffer'
+        })
+    },
+
+    // 导入考评记录总表
+    importEvaluationRecords(file) {
+        const formData = new FormData()
+        formData.append('file', file)
+        return apiClient.post('/evaluation-records/import/', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+    },
+
+    // 创建考评记录
+    createEvaluationRecord(payload) {
+        return apiClient.post('/evaluation-records/', payload)
+    },
+
+    // 更新考评记录
+    updateEvaluationRecord(id, payload) {
+        return apiClient.put(`/evaluation-records/${id}/`, payload)
+    },
+
+    // 删除考评记录
+    deleteEvaluationRecord(id) {
+        return apiClient.delete(`/evaluation-records/${id}/`)
+    }
+}
+
 // 备忘录管理服务
 export const memoService = {
     // 获取所有备忘录
