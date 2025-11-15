@@ -59,3 +59,4 @@ htmlcov/
 .ruff_cache/
 .sass-cache/
 
+.gitignore
