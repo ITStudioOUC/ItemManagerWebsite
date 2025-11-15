@@ -431,21 +431,28 @@ export const projectGroupService = {
 
 // 考评记录服务
 export const evaluationService = {
-    // 获取考评记录列表
-    getEvaluationRecords(params = {}) {
-        return apiClient.get('/evaluation-records/', { params })
+    // 获取人员汇总列表
+    getPersonnelSummary(params = {}) {
+        return apiClient.get('/evaluation-records/personnel-summary/', { params })
     },
 
-    // 导出考评记录总表
-    exportEvaluationRecords(params = {}) {
+    // 获取某个人员的所有记录
+    getPersonnelRecords(personnelName, params = {}) {
+        return apiClient.get('/evaluation-records/personnel-records/', { 
+            params: { ...params, personnel: personnelName }
+        })
+    },
+
+    // 导出人员考评记录
+    exportPersonnelRecords(params = {}) {
         return apiClient.get('/evaluation-records/export/', {
             params,
             responseType: 'arraybuffer'
         })
     },
 
-    // 导入考评记录总表
-    importEvaluationRecords(file) {
+    // 导入人员考评记录
+    importPersonnelRecords(file) {
         const formData = new FormData()
         formData.append('file', file)
         return apiClient.post('/evaluation-records/import/', formData, {
@@ -453,6 +460,18 @@ export const evaluationService = {
                 'Content-Type': 'multipart/form-data'
             }
         })
+    },
+
+    // 下载导入样表
+    downloadTemplate() {
+        return apiClient.get('/evaluation-records/download-template/', {
+            responseType: 'arraybuffer'
+        })
+    },
+
+    // 获取考评记录列表（用于详情页）
+    getEvaluationRecords(params = {}) {
+        return apiClient.get('/evaluation-records/', { params })
     },
 
     // 创建考评记录
@@ -468,6 +487,18 @@ export const evaluationService = {
     // 删除考评记录
     deleteEvaluationRecord(id) {
         return apiClient.delete(`/evaluation-records/${id}/`)
+    },
+
+    // 删除某个人员的所有记录
+    deletePersonnelRecords(personnelName, departmentName = '', grade = '') {
+        const params = { personnel: personnelName }
+        if (departmentName) {
+            params.department = departmentName
+        }
+        if (grade) {
+            params.grade = grade
+        }
+        return apiClient.delete('/evaluation-records/delete-personnel/', { params })
     }
 }
 

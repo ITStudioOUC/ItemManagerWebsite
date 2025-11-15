@@ -13,6 +13,7 @@ import DepartmentProjectGroupManagement from '../views/DepartmentProjectGroupMan
 import Settings from '../views/Settings.vue'
 import Memo from '../views/Memo.vue'
 import EvaluationRecordList from '../views/EvaluationRecordList.vue'
+import EvaluationRecordDetail from '../views/EvaluationRecordDetail.vue'
 import { authService } from '@/services/api'
 
 const routes = [
@@ -87,6 +88,12 @@ const routes = [
     path: '/evaluations',
     name: 'EvaluationRecordList',
     component: EvaluationRecordList
+  },
+  {
+    path: '/evaluations/:personnel',
+    name: 'EvaluationRecordDetail',
+    component: EvaluationRecordDetail,
+    props: true
   }
 ]
 

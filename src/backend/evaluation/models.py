@@ -10,12 +10,8 @@ class EvaluationRecord(models.Model):
         related_name='evaluation_records',
         verbose_name='所属部门'
     )
-    personnel = models.ForeignKey(
-        'personnel.Personnel',
-        on_delete=models.CASCADE,
-        related_name='evaluation_records',
-        verbose_name='人员'
-    )
+    personnel = models.CharField(max_length=100, verbose_name='人员')
+    grade = models.CharField(max_length=50, blank=True, verbose_name='年级')
     item_description = models.CharField(max_length=255, verbose_name='加/扣分事项说明')
     bonus_score = models.DecimalField(max_digits=8, decimal_places=2, default=0, verbose_name='加分数值')
     deduction_score = models.DecimalField(max_digits=8, decimal_places=2, default=0, verbose_name='扣分数值')
@@ -32,10 +28,11 @@ class EvaluationRecord(models.Model):
         indexes = [
             models.Index(fields=['department', 'evaluation_date']),
             models.Index(fields=['personnel', 'evaluation_date']),
+            models.Index(fields=['evaluation_date']),
         ]
 
     def __str__(self):
-        return f'{self.evaluation_date} {self.personnel.name} ({self.total_score})'
+        return f'{self.evaluation_date} {self.personnel} ({self.total_score})'
 
     def save(self, *args, **kwargs):
         self.total_score = (self.bonus_score or 0) - (self.deduction_score or 0)
