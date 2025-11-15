@@ -652,7 +652,6 @@ export default {
 
 <style scoped>
 .evaluation-container {
-  max-width: 1200px;
   margin: 20px auto;
   padding: 0 20px;
 }

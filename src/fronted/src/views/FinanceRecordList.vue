@@ -1,7 +1,7 @@
 <template>
   <div>
     <AppHeader />
-    <div>
+    <div class="finance-dashboard">
       <el-card>
         <template #header>
           <div class="card-header">
@@ -306,6 +306,10 @@ export default {
 </script>
 
 <style scoped>
+.finance-dashboard {
+  margin: 20px auto;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
