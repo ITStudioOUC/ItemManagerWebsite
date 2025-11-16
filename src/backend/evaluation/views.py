@@ -1,5 +1,6 @@
 import csv
 import io
+import logging
 from datetime import datetime, date, timedelta
 from decimal import Decimal
 import os
@@ -20,10 +21,13 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 
 from finance.models import Department
+from email_notice.services import EmailNotificationService
 
 from .filters import EvaluationRecordFilter
 from .models import EvaluationRecord
 from .serializers import EvaluationRecordSerializer, PersonnelSummarySerializer
+
+logger = logging.getLogger(__name__)
 
 
 class EvaluationRecordViewSet(viewsets.ModelViewSet):
@@ -36,6 +40,43 @@ class EvaluationRecordViewSet(viewsets.ModelViewSet):
     search_fields = ['item_description', 'remarks', 'personnel', 'department__name', 'grade']
     ordering_fields = ['evaluation_date', 'created_at', 'total_score', 'bonus_score', 'deduction_score']
     ordering = ['-evaluation_date', '-created_at']
+
+    def perform_create(self, serializer):
+        """创建考评记录时发送邮箱通知"""
+        instance = serializer.save()
+
+        # 异步发送邮箱通知
+        user_info = getattr(self.request.user, 'username', '系统') if hasattr(self.request, 'user') else '系统'
+        EmailNotificationService.send_evaluation_operation_notification(
+            'CREATE',
+            evaluation_instance=instance,
+            user_info=user_info
+        )
+
+    def perform_update(self, serializer):
+        """更新考评记录时发送邮箱通知"""
+        instance = serializer.save()
+
+        # 异步发送邮箱通知
+        user_info = getattr(self.request.user, 'username', '系统') if hasattr(self.request, 'user') else '系统'
+        EmailNotificationService.send_evaluation_operation_notification(
+            'UPDATE',
+            evaluation_instance=instance,
+            user_info=user_info
+        )
+
+    def perform_destroy(self, instance):
+        """删除考评记录时发送邮箱通知"""
+        # 异步发送邮箱通知
+        user_info = getattr(self.request.user, 'username', '系统') if hasattr(self.request, 'user') else '系统'
+        EmailNotificationService.send_evaluation_operation_notification(
+            'DELETE',
+            evaluation_instance=instance,
+            user_info=user_info
+        )
+
+        # 执行删除
+        instance.delete()
 
     @action(detail=False, methods=['get'], url_path='personnel-summary')
     def personnel_summary(self, request, *args, **kwargs):
@@ -98,13 +139,32 @@ class EvaluationRecordViewSet(viewsets.ModelViewSet):
         # 查找要删除的记录
         queryset = self.get_queryset().filter(**filter_params)
         deleted_count = queryset.count()
-        
+
         if deleted_count == 0:
             return Response({'detail': '未找到要删除的记录'}, status=status.HTTP_404_NOT_FOUND)
-        
+
+        # 收集删除的记录信息用于通知
+        deleted_info = {
+            'personnel': personnel_name,
+            'department': department_name if department_name else '未指定',
+            'grade': grade if grade else '未指定',
+            'count': deleted_count
+        }
+
         # 删除记录
         queryset.delete()
-        
+
+        # 异步发送邮箱通知
+        user_info = getattr(request.user, 'username', '系统') if hasattr(request, 'user') else '系统'
+        operation_description = f"删除人员考评记录 - {personnel_name}({deleted_info['department']}-{deleted_info['grade']})，共{deleted_count}条记录"
+
+        EmailNotificationService.send_evaluation_operation_notification(
+            'DELETE',
+            evaluation_instance=None,
+            user_info=user_info,
+            operation_description=operation_description
+        )
+
         return Response({
             'detail': f'成功删除 {deleted_count} 条记录',
             'deleted_count': deleted_count
@@ -204,6 +264,18 @@ class EvaluationRecordViewSet(viewsets.ModelViewSet):
         output.seek(0)
 
         filename = f'人员考评记录_{timezone.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+
+        # 异步发送邮箱通知
+        user_info = getattr(request.user, 'username', '系统') if hasattr(request, 'user') else '系统'
+        operation_description = f"导出考评记录 - {len(personnel_groups)}名人员，共{queryset.count()}条记录"
+
+        EmailNotificationService.send_evaluation_operation_notification(
+            'CREATE',
+            evaluation_instance=None,
+            user_info=user_info,
+            operation_description=operation_description
+        )
+
         response = HttpResponse(
             output.getvalue(),
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -503,6 +575,21 @@ class EvaluationRecordViewSet(viewsets.ModelViewSet):
                 # 完整格式导入时，先删除所有记录（保持原有行为）
                 EvaluationRecord.objects.all().delete()
             EvaluationRecord.objects.bulk_create(records_to_create)
+
+        # 异步发送邮箱通知
+        user_info = getattr(request.user, 'username', '系统') if hasattr(request, 'user') else '系统'
+        operation_description = f"导入考评人员 - {len(records_to_create)}条记录"
+        if is_template_format:
+            operation_description += "（样表格式）"
+        else:
+            operation_description += "（完整格式）"
+
+        EmailNotificationService.send_evaluation_operation_notification(
+            'CREATE',
+            evaluation_instance=None,
+            user_info=user_info,
+            operation_description=operation_description
+        )
 
         skip_msg = f'，跳过 {skipped_count} 条已存在的记录' if skipped_count > 0 else ''
         return Response({

@@ -1,10 +1,12 @@
 import json
 import logging
+import threading
 
 from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -75,6 +77,19 @@ LABEL_MAP = {
     'qq': 'QQ',
     'email': '邮箱',
     'grader_major': '年级专业',
+
+    # 考评相关
+    'personnel': '人员姓名',
+    'grade': '年级',
+    'item_description': '加/扣分事项说明',
+    'bonus_score': '加分数值',
+    'deduction_score': '扣分数值',
+    'total_score': '总分',
+    'evaluation_date': '考评日期',
+    'remarks': '备注',
+    'count': '记录数量',
+    'records_count': '记录数量',
+    'personnel_count': '人员数量',
 }
 
 # 这些key为元信息，不参与详情表格展示
@@ -125,6 +140,21 @@ def _build_data_items(instance_data: dict):
 
 class EmailNotificationService:
     """邮件通知服务"""
+
+    @staticmethod
+    def _send_notification_async(operation_type, model_name, instance_data, user_info=None):
+        """异步发送邮件通知的内部方法"""
+        def send_email_task():
+            try:
+                EmailNotificationService.send_operation_notification(
+                    operation_type, model_name, instance_data, user_info
+                )
+            except Exception as e:
+                logger.error(f"异步发送邮件通知失败: {e}")
+
+        # 使用线程异步发送
+        thread = threading.Thread(target=send_email_task, daemon=True)
+        thread.start()
 
     @staticmethod
     def get_notification_settings():
@@ -229,7 +259,7 @@ class EmailNotificationService:
 
     @staticmethod
     def send_item_operation_notification(operation_type, item_instance, user_info=None):
-        """发送物品操作通知"""
+        """异步发送物品操作通知"""
         try:
             instance_data = {
                 'id': getattr(item_instance, 'id', None),
@@ -241,15 +271,15 @@ class EmailNotificationService:
                 'timestamp': str(getattr(item_instance, 'updated_at', '')),
             }
 
-            EmailNotificationService.send_operation_notification(
+            EmailNotificationService._send_notification_async(
                 operation_type, '物品', instance_data, user_info
             )
         except Exception as e:
-            logger.error(f"发送物品操作通知失败: {e}")
+            logger.error(f"准备物品操作通知失败: {e}")
 
     @staticmethod
     def send_finance_operation_notification(operation_type, finance_instance, user_info=None):
-        """发送财务记录操作通知"""
+        """异步发送财务记录操作通知"""
         try:
             instance_data = {
                 'id': getattr(finance_instance, 'id', None),
@@ -262,11 +292,48 @@ class EmailNotificationService:
                 'timestamp': str(getattr(finance_instance, 'transaction_date', '')),
             }
 
-            EmailNotificationService.send_operation_notification(
+            EmailNotificationService._send_notification_async(
                 operation_type, '财务记录', instance_data, user_info
             )
         except Exception as e:
-            logger.error(f"发送财务记录操作通知失败: {e}")
+            logger.error(f"准备财务记录操作通知失败: {e}")
+
+    @staticmethod
+    def send_evaluation_operation_notification(operation_type, evaluation_instance=None, user_info=None, operation_description=None):
+        """异步发送考评操作通知"""
+        try:
+            if evaluation_instance:
+                # 单个考评记录的操作通知
+                instance_data = {
+                    'id': getattr(evaluation_instance, 'id', None),
+                    'personnel': getattr(evaluation_instance, 'personnel', ''),
+                    'department': str(getattr(evaluation_instance, 'department', '')),
+                    'grade': getattr(evaluation_instance, 'grade', ''),
+                    'item_description': getattr(evaluation_instance, 'item_description', ''),
+                    'bonus_score': str(getattr(evaluation_instance, 'bonus_score', 0)),
+                    'deduction_score': str(getattr(evaluation_instance, 'deduction_score', 0)),
+                    'total_score': str(getattr(evaluation_instance, 'total_score', 0)),
+                    'evaluation_date': str(getattr(evaluation_instance, 'evaluation_date', '')),
+                    'remarks': getattr(evaluation_instance, 'remarks', ''),
+                    'timestamp': str(getattr(evaluation_instance, 'updated_at', '')),
+                }
+                model_name = '考评记录'
+            else:
+                # 批量操作通知（导入/导出/删除人员）
+                instance_data = {
+                    'operation_type': operation_description or operation_type,
+                    'timestamp': str(timezone.now()),
+                }
+                model_name = '考评人员'
+
+            if operation_description:
+                instance_data['operation_type'] = operation_description
+
+            EmailNotificationService._send_notification_async(
+                operation_type, model_name, instance_data, user_info
+            )
+        except Exception as e:
+            logger.error(f"准备考评操作通知失败: {e}")
 
     @staticmethod
     def update_notification_emails(emails_data):
