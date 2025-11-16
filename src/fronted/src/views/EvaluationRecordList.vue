@@ -67,11 +67,34 @@
                 @change="fetchRecords">
               </el-input>
             </el-form-item>
+            <el-form-item label="分数筛选">
+              <el-row :gutter="10" style="min-width: 300px">
+                <el-col :span="8">
+                  <el-select
+                    v-model="filters.scoreCondition"
+                    placeholder="条件"
+                    @change="applyScoreFilter">
+                    <el-option label="高于" value="gt"/>
+                    <el-option label="等于" value="eq"/>
+                    <el-option label="低于" value="lt"/>
+                  </el-select>
+                </el-col>
+                <el-col :span="16">
+                  <el-input-number
+                    v-model="filters.scoreValue"
+                    placeholder="输入分数"
+                    :step="0.01"
+                    :precision="2"
+                    style="width: 100%"
+                    @change="applyScoreFilter"/>
+                </el-col>
+              </el-row>
+            </el-form-item>
           </el-form>
         </div>
 
         <el-table
-          :data="personnelList"
+          :data="filteredPersonnelList"
           style="width: 100%"
           v-loading="loading"
           stripe
@@ -96,8 +119,8 @@
 
         <div class="summary-bar">
           <div>
-            <span>人员数：{{ personnelList.length }}</span>
-            <span>平均分：{{ averageScore }}</span>
+            <span>人员数：{{ filteredPersonnelList.length }}</span>
+            <span>平均分：{{ filteredAverageScore }}</span>
           </div>
         </div>
       </el-card>
@@ -131,17 +154,49 @@ export default {
       filters: {
         department: '',
         personnel: '',
-        grade: ''
+        grade: '',
+        scoreCondition: '',
+        scoreValue: null
       }
     }
   },
   computed: {
+    filteredPersonnelList() {
+      let filtered = [...this.personnelList]
+
+      if (this.filters.scoreCondition && this.filters.scoreValue !== null && this.filters.scoreValue !== '') {
+        const value = Number(this.filters.scoreValue)
+        filtered = filtered.filter(person => {
+          const score = Number(person.total_score || 0)
+          switch (this.filters.scoreCondition) {
+            case 'gt':
+              return score > value
+            case 'eq':
+              return Math.abs(score - value) < 0.01
+            case 'lt':
+              return score < value
+            default:
+              return true
+          }
+        })
+      }
+
+      return filtered
+    },
     averageScore() {
       if (!this.personnelList || this.personnelList.length === 0) {
         return '0.00'
       }
       const total = this.personnelList.reduce((sum, item) => sum + Number(item.total_score || 0), 0)
       const average = total / this.personnelList.length
+      return average.toFixed(2)
+    },
+    filteredAverageScore() {
+      if (!this.filteredPersonnelList || this.filteredPersonnelList.length === 0) {
+        return '0.00'
+      }
+      const total = this.filteredPersonnelList.reduce((sum, item) => sum + Number(item.total_score || 0), 0)
+      const average = total / this.filteredPersonnelList.length
       return average.toFixed(2)
     }
   },
@@ -187,9 +242,13 @@ export default {
       this.filters = {
         department: '',
         personnel: '',
-        grade: ''
+        grade: '',
+        scoreCondition: '',
+        scoreValue: null
       }
       this.fetchRecords()
+    },
+    applyScoreFilter() {
     },
     editPersonnel(row) {
       this.$router.push({
@@ -281,7 +340,7 @@ export default {
       }
     },
     async handleExport() {
-      if (!this.personnelList.length) {
+      if (!this.filteredPersonnelList.length) {
         ElMessage.warning('暂无数据可导出')
         return
       }
